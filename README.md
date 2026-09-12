@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ TaskFlow — Modern Task Management & Productivity Suite
+# ⚡ Stride - Make progress, everyday
 
 **A high-performance, full-stack productivity workspace engineered with React 19, TypeScript, Express, SQLite, Neon Cloud Postgres, and JWT security.**
 
