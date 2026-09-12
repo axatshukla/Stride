@@ -4,13 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
-    "test": "jest --runInBand",
+    "dev": "concurrently -k -n \"server,client\" -c \"blue,magenta\" \"npm run server:dev\" \"npm run client:dev\"",
+    "client:dev": "vite",
     "server:dev": "tsx watch server/src/server.ts",
     "server:build": "tsc -p server/tsconfig.json",
-    "server:start": "node server/dist/server.js"
+    "server:start": "node server/dist/server.js",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@neon/config": "^1.4.2",
@@ -39,6 +40,7 @@
     "@types/react-dom": "^19.2.7",
     "@types/supertest": "^7.2.1",
     "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
     "jest": "^30.5.1",
     "oxlint": "^1.81.0",
     "supertest": "^7.2.2",
