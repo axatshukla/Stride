@@ -204,11 +204,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <div className="sidebar-footer">
           <div className="sidebar-user" onClick={logout} title="Click to log out">
             <div className="sidebar-user-avatar">
-              {currentUser.initials}
+              {currentUser?.initials || 'U'}
             </div>
             <div className="sidebar-user-info">
-              <div className="sidebar-user-name">{currentUser.name}</div>
-              <div className="sidebar-user-email">{currentUser.email}</div>
+              <div className="sidebar-user-name">{currentUser?.name || 'User'}</div>
+              <div className="sidebar-user-email">{currentUser?.email || ''}</div>
             </div>
             <span style={{ color: 'var(--text-muted)' }}>
               {icons.logout}

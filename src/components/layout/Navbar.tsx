@@ -49,8 +49,8 @@ export default function Navbar() {
           <span className="badge-dot" />
         </button>
 
-        <div className="navbar-avatar" title={currentUser.name}>
-          {currentUser.initials}
+        <div className="navbar-avatar" title={currentUser?.name || 'User'}>
+          {currentUser?.initials || 'U'}
         </div>
       </div>
     </header>

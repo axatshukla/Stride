@@ -8,9 +8,9 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState<'profile' | 'workspace' | 'notifications' | 'security'>('profile');
 
   // Profile form state
-  const [name, setName] = useState(currentUser.name);
-  const [email, setEmail] = useState(currentUser.email);
-  const [title, setTitle] = useState('Lead Full-Stack Developer');
+  const [name, setName] = useState(currentUser?.name || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
+  const [title, setTitle] = useState('Workspace Member');
 
   // Workspace form state
   const [workspaceName, setWorkspaceName] = useState('Stride Workspace');

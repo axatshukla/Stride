@@ -9,7 +9,7 @@ import type { Task, User, TaskFilters, Page, ToastMessage, TaskStatus, TaskPrior
 
 interface AppContextType {
   // Auth
-  currentUser: User;
+  currentUser: User | null;
   users: User[];
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -53,21 +53,13 @@ interface AppContextType {
   removeToast: (id: string) => void;
 }
 
-const fallbackUser: User = {
-  id: 'u1',
-  name: 'Akshat Shukla',
-  email: 'akshat@taskflow.dev',
-  initials: 'AS',
-  color: '#4F46E5',
-};
-
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   // -- Auth State --
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(Boolean(getAuthToken()));
-  const [user, setUser] = useState<User>(fallbackUser);
-  const [users, setUsers] = useState<User[]>([fallbackUser]);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // -- Task State --
@@ -132,20 +124,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setTasks(tasksRes.tasks);
         setIsAuthenticated(true);
       } else {
-        // Auto-login demo user for immediate instant usability
-        const loginRes = await authApi.login('akshat@taskflow.dev', 'password123');
-        setUser(loginRes.user);
-        setIsAuthenticated(true);
-        const [usersRes, tasksRes] = await Promise.all([
-          authApi.getUsers(),
-          taskApi.getTasks(),
-        ]);
-        setUsers(usersRes.users);
-        setTasks(tasksRes.tasks);
+        // No active session — start cleanly on the login screen
+        setIsAuthenticated(false);
+        setUser(null);
+        setTasks([]);
+        setUsers([]);
       }
     } catch (err: any) {
-      console.error('Initial data load error:', err);
+      console.error('Initial data load error / session expired:', err);
+      setAuthToken(null);
       setIsAuthenticated(false);
+      setUser(null);
+      setTasks([]);
+      setUsers([]);
     } finally {
       setIsLoading(false);
     }
@@ -195,7 +186,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     setAuthToken(null);
     setIsAuthenticated(false);
+    setUser(null);
     setTasks([]);
+    setUsers([]);
+    setCurrentPage('dashboard');
   }, []);
 
   // -- Task Actions (Calling Live API with State Synchronization) --
@@ -367,3 +361,4 @@ export function useApp(): AppContextType {
   if (!ctx) throw new Error('useApp must be used within AppProvider');
   return ctx;
 }
+

@@ -12,7 +12,33 @@ import AuthPage from './components/auth/AuthPage';
 import './App.css';
 
 function MainApp() {
-  const { isAuthenticated, currentPage } = useApp();
+  const { isAuthenticated, isLoading, currentPage } = useApp();
+
+  if (isLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--bg-primary)',
+        gap: '16px'
+      }}>
+        <div style={{
+          width: '32px',
+          height: '32px',
+          border: '3px solid var(--border)',
+          borderTopColor: 'var(--accent)',
+          borderRadius: '50%',
+          animation: 'spin 0.7s linear infinite'
+        }} />
+        <span style={{ fontSize: '13.5px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+          Loading workspace...
+        </span>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <AuthPage />;
