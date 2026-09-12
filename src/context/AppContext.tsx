@@ -13,8 +13,8 @@ interface AppContextType {
   users: User[];
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 
   // Tasks
@@ -147,7 +147,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [loadInitialData]);
 
   // -- Auth Actions --
-  const login = useCallback(async (email: string, pass: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, pass: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await authApi.login(email, pass);
       setUser(res.user);
@@ -158,14 +158,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ]);
       setUsers(usersRes.users);
       setTasks(tasksRes.tasks);
-      return true;
+      return { success: true };
     } catch (err: any) {
-      addToast('error', err.message || 'Login failed');
-      return false;
+      const msg = err.message || 'Incorrect email or password.';
+      addToast('error', msg);
+      return { success: false, error: msg };
     }
   }, [addToast]);
 
-  const signup = useCallback(async (name: string, email: string, pass: string): Promise<boolean> => {
+  const signup = useCallback(async (name: string, email: string, pass: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await authApi.signup(name, email, pass);
       setUser(res.user);
@@ -176,10 +177,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ]);
       setUsers(usersRes.users);
       setTasks(tasksRes.tasks);
-      return true;
+      return { success: true };
     } catch (err: any) {
-      addToast('error', err.message || 'Registration failed');
-      return false;
+      const msg = err.message || 'Registration failed.';
+      addToast('error', msg);
+      return { success: false, error: msg };
     }
   }, [addToast]);
 
