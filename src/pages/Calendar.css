@@ -1,0 +1,257 @@
+/* ============================================================
+   Calendar Page Styles — Linear / Editorial Minimalist Design
+   ============================================================ */
+
+.calendar-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.calendar-title-wrap h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.calendar-title-wrap p {
+  font-size: 13.5px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.calendar-month-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px 8px;
+}
+
+.calendar-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.calendar-nav-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.calendar-current-month {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 130px;
+  text-align: center;
+}
+
+/* -- Calendar Grid Container -- */
+.calendar-grid-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Header with 7 Days */
+.calendar-days-header {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  background: #F8FAFC;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  width: 100%;
+}
+
+.calendar-day-name {
+  padding: 10px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.calendar-day-name:last-child {
+  border-right: none;
+}
+
+/* 7-Column Days Grid */
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(115px, 1fr);
+  width: 100%;
+  background: var(--border-subtle);
+  gap: 1px; /* Clean 1px grid line separation */
+}
+
+.calendar-cell {
+  background: #FFFFFF;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 115px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  overflow: hidden;
+}
+
+.calendar-cell:hover {
+  background: #F8FAFC;
+}
+
+.calendar-cell.other-month {
+  background: #FAFAFB;
+  opacity: 0.55;
+}
+
+.calendar-cell.other-month:hover {
+  background: #F4F5F7;
+  opacity: 0.75;
+}
+
+.calendar-cell.today {
+  background: #FFFFFF;
+}
+
+.calendar-cell-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calendar-date-number {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.calendar-cell.today .calendar-date-number {
+  background: var(--accent);
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.calendar-task-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  background: var(--surface-hover);
+  padding: 1px 5px;
+  border-radius: var(--radius-full);
+}
+
+.calendar-cell-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Task Pill within Calendar Cell */
+.calendar-task-item {
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border-left: 2px solid transparent;
+}
+
+.calendar-task-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08);
+}
+
+.calendar-task-key {
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.calendar-task-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* Status variants */
+.calendar-task-item.status-todo {
+  background: var(--status-todo-bg);
+  color: var(--status-todo);
+  border-left-color: var(--status-todo);
+}
+
+.calendar-task-item.status-in-progress {
+  background: var(--status-progress-bg);
+  color: var(--status-progress);
+  border-left-color: var(--status-progress);
+}
+
+.calendar-task-item.status-done {
+  background: var(--status-done-bg);
+  color: var(--status-done);
+  border-left-color: var(--status-done);
+}
+
+@media (max-width: 900px) {
+  .calendar-days-grid {
+    grid-auto-rows: minmax(80px, 1fr);
+  }
+  .calendar-cell {
+    padding: 4px;
+    min-height: 80px;
+  }
+  .calendar-task-item {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+}
