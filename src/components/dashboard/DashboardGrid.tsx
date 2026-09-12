@@ -289,7 +289,7 @@ export default function DashboardGrid() {
           <div className="dash-card">
             <div className="dash-card-header">
               <span className="dash-card-title">Sprint Progress</span>
-              <span className="dash-card-badge-select">This Sprint ▾</span>
+              <span className="dash-card-badge-select">Active Sprint</span>
             </div>
 
             <div className="sprint-progress-stat">

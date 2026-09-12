@@ -13,13 +13,6 @@ const searchIcon = (
   </svg>
 );
 
-const bellIcon = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8">
-    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-    <path d="M13.73 21a2 2 0 01-3.46 0" />
-  </svg>
-);
-
 export default function Navbar() {
   const { currentUser, filters, setFilters, setCurrentPage, logout, addToast } = useApp();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -69,15 +62,6 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-right">
-        <button
-          className="navbar-icon-btn"
-          aria-label="Notifications"
-          onClick={() => addToast('info', 'You have no unread notifications.')}
-        >
-          {bellIcon}
-          <span className="badge-dot" />
-        </button>
-
         {/* Profile Menu Container */}
         <div className="navbar-profile-container" ref={dropdownRef}>
           <button

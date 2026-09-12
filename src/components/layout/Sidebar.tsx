@@ -202,7 +202,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
         {/* Footer User Profile */}
         <div className="sidebar-footer">
-          <div className="sidebar-user" onClick={logout} title="Click to log out">
+          <div className="sidebar-user" onClick={() => handleNav('settings')} title="View Settings & Profile">
             <div className="sidebar-user-avatar">
               {currentUser?.initials || 'U'}
             </div>
@@ -210,9 +210,28 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               <div className="sidebar-user-name">{currentUser?.name || 'User'}</div>
               <div className="sidebar-user-email">{currentUser?.email || ''}</div>
             </div>
-            <span style={{ color: 'var(--text-muted)' }}>
+            <button
+              type="button"
+              className="sidebar-logout-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                logout();
+              }}
+              title="Log out"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text-muted)',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '4px',
+              }}
+            >
               {icons.logout}
-            </span>
+            </button>
           </div>
         </div>
       </aside>
