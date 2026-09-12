@@ -9,6 +9,7 @@ module.exports = {
   resetMocks: true,
   restoreMocks: true,
   testTimeout: 20000,
+  setupFiles: ['<rootDir>/server/tests/setup.ts'],
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
