@@ -75,7 +75,7 @@ export default function AuthPage() {
           <p className="auth-subtitle">
             {isSignUp
               ? 'Start tracking sprints and tasks with high clarity'
-              : 'Make progress, everyday — enter your credentials'}
+              : 'Make progress, everyday'}
           </p>
         </div>
 
