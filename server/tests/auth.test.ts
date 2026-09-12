@@ -4,8 +4,8 @@ import { initDatabase, closeDatabase } from '../src/db';
 
 const app = createApp();
 
-beforeAll(() => {
-  initDatabase();
+beforeAll(async () => {
+  await initDatabase();
 });
 
 afterAll(() => {

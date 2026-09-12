@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/auth';
-import { getDatabase } from '../db/database';
+import { dbRepo } from '../db/database';
 import { AppError } from './errorHandler';
 
 export interface AuthenticatedUser {
@@ -24,7 +24,7 @@ declare global {
  * Express middleware to authenticate requests via Bearer JWT.
  * Verifies token, fetches user from database, and attaches req.user.
  */
-export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
+export async function requireAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -38,17 +38,19 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction): v
 
   try {
     const payload = verifyToken(token);
-    const db = getDatabase();
-
-    const user = db
-      .prepare('SELECT id, name, email, initials, color FROM users WHERE id = ?')
-      .get(payload.userId) as AuthenticatedUser | undefined;
+    const user = await dbRepo.findUserById(payload.userId);
 
     if (!user) {
       return next(new AppError('User belonging to this token no longer exists.', 401));
     }
 
-    req.user = user;
+    req.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      initials: user.initials,
+      color: user.color,
+    };
     next();
   } catch (err) {
     next(err);

@@ -4,8 +4,8 @@ import { initDatabase, closeDatabase } from '../src/db';
 
 const app = createApp();
 
-beforeAll(() => {
-  initDatabase();
+beforeAll(async () => {
+  await initDatabase();
 });
 
 afterAll(() => {
@@ -14,17 +14,21 @@ afterAll(() => {
 
 describe('📋 Task Management CRUD & Filter REST API Tests', () => {
   let authToken = '';
+  let userId = '';
   let createdTaskId = '';
 
   beforeAll(async () => {
-    // Log in as seed admin user to get JWT
+    // Register test user dynamically
+    const testEmail = `test_runner_${Date.now()}@taskflow.dev`;
     const res = await request(app)
-      .post('/api/auth/login')
+      .post('/api/auth/signup')
       .send({
-        email: 'akshat@taskflow.dev',
+        name: 'Test Engineer',
+        email: testEmail,
         password: 'password123',
       });
     authToken = res.body.token;
+    userId = res.body.user.id;
   });
 
   describe('GET /api/tasks (Authentication Guard)', () => {
@@ -67,7 +71,7 @@ describe('📋 Task Management CRUD & Filter REST API Tests', () => {
         description: 'Verify end-to-end task creation via Supertest',
         status: 'todo',
         priority: 'high',
-        assignee_id: 'u1',
+        assignee_id: userId,
         dueDate: '2026-09-30T00:00:00Z',
         tags: ['testing', 'jest'],
       };
@@ -82,7 +86,7 @@ describe('📋 Task Management CRUD & Filter REST API Tests', () => {
       expect(res.body.task).toBeDefined();
       expect(res.body.task.title).toBe(newTaskPayload.title);
       expect(res.body.task.key).toMatch(/^TSK-\d+$/);
-      expect(res.body.task.assignee.name).toBe('Akshat Shukla');
+      expect(res.body.task.assignee.name).toBe('Test Engineer');
 
       createdTaskId = res.body.task.id;
     });

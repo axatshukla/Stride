@@ -1,15 +1,17 @@
-import { getDatabase, closeDatabase } from './database';
+import { getDatabase, closeDatabase, isPostgres } from './database';
 import { runMigrations } from './migrations';
 import { seedDatabase } from './seed';
 
 /**
- * Initializes database connection, applies migrations, and seeds initial data.
+ * Initializes database connection, applies migrations, and prepares database state.
  */
-export function initDatabase(): void {
-  console.log('🔄 Initializing SQLite database connection...');
-  getDatabase();
-  runMigrations();
-  seedDatabase();
+export async function initDatabase(): Promise<void> {
+  console.log(`🔄 Initializing ${isPostgres ? 'Neon Cloud Postgres' : 'SQLite'} database connection...`);
+  if (!isPostgres) {
+    getDatabase();
+  }
+  await runMigrations();
+  await seedDatabase();
 }
 
-export { getDatabase, closeDatabase };
+export { getDatabase, closeDatabase, isPostgres };

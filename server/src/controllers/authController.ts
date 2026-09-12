@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { getDatabase } from '../db/database';
+import { dbRepo } from '../db/database';
 import { AppError } from '../middleware/errorHandler';
 import { hashPassword, comparePassword, generateToken, extractInitials } from '../utils/auth';
 
@@ -25,10 +25,9 @@ export async function signup(req: Request, res: Response, next: NextFunction): P
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanName = name.trim();
-    const db = getDatabase();
 
     // 2. Check for duplicate email
-    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(cleanEmail);
+    const existing = await dbRepo.findUserByEmail(cleanEmail);
     if (existing) {
       throw new AppError('An account with this email address already exists.', 409);
     }
@@ -42,10 +41,16 @@ export async function signup(req: Request, res: Response, next: NextFunction): P
     const now = new Date().toISOString();
 
     // 4. Insert user record
-    db.prepare(`
-      INSERT INTO users (id, name, email, password_hash, initials, color, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, cleanName, cleanEmail, passwordHash, initials, randomColor, now, now);
+    await dbRepo.createUser({
+      id,
+      name: cleanName,
+      email: cleanEmail,
+      password_hash: passwordHash,
+      initials,
+      color: randomColor,
+      created_at: now,
+      updated_at: now,
+    });
 
     // 5. Generate JWT token
     const token = generateToken({ userId: id, email: cleanEmail });
@@ -83,15 +88,9 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const db = getDatabase();
 
     // 1. Fetch user by email
-    const user = db
-      .prepare('SELECT id, name, email, password_hash, initials, color FROM users WHERE email = ?')
-      .get(cleanEmail) as
-      | { id: string; name: string; email: string; password_hash: string; initials: string; color: string }
-      | undefined;
-
+    const user = await dbRepo.findUserByEmail(cleanEmail);
     if (!user) {
       throw new AppError('Invalid email or password.', 401);
     }
@@ -141,15 +140,21 @@ export function getMe(req: Request, res: Response): void {
  * @desc    Get all workspace collaborators
  * @access  Private (Requires Bearer JWT)
  */
-export function getAllUsers(_req: Request, res: Response): void {
-  const db = getDatabase();
-  const users = db
-    .prepare('SELECT id, name, email, initials, color FROM users ORDER BY name ASC')
-    .all();
-
-  res.status(200).json({
-    success: true,
-    count: users.length,
-    users,
-  });
+export async function getAllUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const users = await dbRepo.getAllUsers();
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      users: users.map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        initials: u.initials,
+        color: u.color,
+      })),
+    });
+  } catch (err) {
+    next(err);
+  }
 }
