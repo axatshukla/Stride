@@ -49,6 +49,7 @@ export default function Team() {
     tasks,
     currentUser,
     switchTeam,
+    deleteTeam,
     inviteMember,
     removeMember,
     setCreateTeamModalOpen,
@@ -61,6 +62,8 @@ export default function Team() {
   const [isSendingInvite, setIsSendingInvite] = useState(false);
   const [lastInviteResult, setLastInviteResult] = useState<{ inviteUrl?: string; simulated?: boolean; emailSent?: boolean; emailError?: string } | null>(null);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
+  const [deletingTeam, setDeletingTeam] = useState<typeof teams[0] | null>(null);
+  const [isDeletingTeam, setIsDeletingTeam] = useState(false);
 
   const isOwnerOrAdmin = activeTeam?.role === 'owner' || activeTeam?.role === 'admin';
 
@@ -100,6 +103,14 @@ export default function Team() {
     if (activeTeam?.id !== team.id) {
       await switchTeam(team);
     }
+  };
+
+  const handleConfirmDeleteTeam = async () => {
+    if (!deletingTeam) return;
+    setIsDeletingTeam(true);
+    await deleteTeam(deletingTeam.id);
+    setIsDeletingTeam(false);
+    setDeletingTeam(null);
   };
 
   return (
@@ -147,6 +158,20 @@ export default function Team() {
                       </span>
                     </div>
                   </div>
+                  {t.role === 'owner' && (
+                    <button
+                      type="button"
+                      className="workspace-card-trash-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingTeam(t);
+                      }}
+                      title={`Delete workspace "${t.name}"`}
+                      aria-label={`Delete ${t.name}`}
+                    >
+                      {trashIcon}
+                    </button>
+                  )}
                 </div>
 
                 <div className="workspace-card-bottom">
@@ -197,6 +222,17 @@ export default function Team() {
           </div>
 
           <div className="team-header-actions">
+            {activeTeam?.role === 'owner' && (
+              <button
+                type="button"
+                className="btn btn-secondary btn-danger-action"
+                onClick={() => setDeletingTeam(activeTeam)}
+                title="Delete this workspace"
+              >
+                {trashIcon}
+                <span>Delete Workspace</span>
+              </button>
+            )}
             {isOwnerOrAdmin && (
               <button
                 type="button"
@@ -446,6 +482,67 @@ export default function Team() {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Delete Workspace Confirmation Modal */}
+      {deletingTeam && (
+        <div className="modal-overlay" onClick={() => !isDeletingTeam && setDeletingTeam(null)}>
+          <div className="modal-card delete-workspace-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="workspace-modal-header">
+              <div className="workspace-modal-header-left">
+                <div className="workspace-modal-icon-badge badge-danger">
+                  {trashIcon}
+                </div>
+                <div className="workspace-modal-title-group">
+                  <h2 className="workspace-modal-title">Delete Workspace</h2>
+                  <p className="workspace-modal-subtitle">Permanent action. Please review before proceeding.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="workspace-modal-close-btn"
+                onClick={() => !isDeletingTeam && setDeletingTeam(null)}
+                aria-label="Close"
+                disabled={isDeletingTeam}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="delete-modal-body">
+              <p className="delete-modal-warning-text">
+                Are you sure you want to permanently delete workspace <strong>"{deletingTeam.name}"</strong>?
+              </p>
+              <div className="delete-modal-warning-box">
+                <strong>⚠️ Warning:</strong>
+                <ul>
+                  <li>All sprint tasks in this workspace will be deleted.</li>
+                  <li>All member assignments and invitations will be revoked.</li>
+                  <li>This action cannot be undone.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="create-team-modal-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setDeletingTeam(null)}
+                disabled={isDeletingTeam}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleConfirmDeleteTeam}
+                disabled={isDeletingTeam}
+              >
+                {isDeletingTeam ? 'Deleting Workspace...' : 'Yes, Delete Workspace'}
+              </button>
+            </div>
           </div>
         </div>
       )}

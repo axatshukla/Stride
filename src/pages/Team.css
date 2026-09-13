@@ -429,3 +429,112 @@
   margin-top: 8px;
 }
 
+/* ============================================================
+   Workspace Card Delete & Danger Action Styles
+   ============================================================ */
+
+.workspace-card-trash-btn {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.workspace-card-trash-btn:hover {
+  background: #FEE2E2;
+  color: #DC2626;
+  border-color: #FCA5A5;
+}
+
+.btn-danger-action {
+  color: #DC2626;
+  border-color: #FCA5A5;
+  background: #FFFFFF;
+}
+
+.btn-danger-action:hover {
+  background: #FEF2F2;
+  border-color: #EF4444;
+  color: #B91C1C;
+}
+
+.btn-danger {
+  background: #DC2626;
+  color: #FFFFFF;
+  border: 1px solid #B91C1C;
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #B91C1C;
+  border-color: #991B1B;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.delete-workspace-modal {
+  max-width: 460px;
+  width: 100%;
+}
+
+.badge-danger {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.15) !important;
+}
+
+.delete-modal-body {
+  margin: 18px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.delete-modal-warning-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.delete-modal-warning-box {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #991B1B;
+  line-height: 1.5;
+}
+
+.delete-modal-warning-box strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.delete-modal-warning-box ul {
+  margin: 4px 0 0 16px;
+  padding: 0;
+}
+
+.delete-modal-warning-box li {
+  margin-bottom: 2px;
+}
+

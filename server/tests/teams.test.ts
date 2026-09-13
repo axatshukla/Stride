@@ -170,4 +170,31 @@ describe('👥 Multi-Tenant Team Workspaces & Email Invitation API Tests', () =>
       expect(user2TeamTasks.body.tasks.some((t: any) => t.title === 'Build iOS Navigation bar')).toBe(true);
     });
   });
+
+  describe('DELETE /api/teams/:id (Team Deletion & Authorization)', () => {
+    it('should reject team deletion by non-owner member with 403 Forbidden', async () => {
+      const res = await request(app)
+        .delete(`/api/teams/${createdTeamId}`)
+        .set('Authorization', `Bearer ${user2Token}`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it('should allow team owner to delete team workspace and return 200 OK', async () => {
+      const res = await request(app)
+        .delete(`/api/teams/${createdTeamId}`)
+        .set('Authorization', `Bearer ${user1Token}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+
+      // Verify team no longer exists for User 1
+      const teamsRes = await request(app)
+        .get('/api/teams')
+        .set('Authorization', `Bearer ${user1Token}`);
+
+      expect(teamsRes.body.teams.some((t: any) => t.id === createdTeamId)).toBe(false);
+    });
+  });
 });
+

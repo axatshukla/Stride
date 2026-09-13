@@ -12,6 +12,7 @@ import {
   getInvitation,
   acceptInvitation,
   removeMember,
+  deleteTeam,
 } from '../controllers/teamController';
 import { requireAuth } from '../middleware/authMiddleware';
 
@@ -25,6 +26,7 @@ router.use(requireAuth);
 
 router.get('/', getUserTeams);
 router.post('/', createTeam);
+router.delete('/:id', deleteTeam);
 router.get('/:id/members', getTeamMembers);
 router.post('/:id/invite', inviteMember);
 router.get('/:id/invitations', getPendingInvitations);

@@ -316,3 +316,35 @@ export async function removeMember(req: Request, res: Response, next: NextFuncti
     next(err);
   }
 }
+
+/**
+ * @route   DELETE /api/teams/:id
+ * @desc    Delete a team workspace (Owner only)
+ * @access  Private
+ */
+export async function deleteTeam(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const callerId = req.user!.id;
+    const teamId = req.params.id as string;
+
+    const team = await dbRepo.getTeamById(teamId);
+    if (!team) {
+      throw new AppError('Team workspace not found.', 404);
+    }
+
+    const callerRole = await dbRepo.getUserRoleInTeam(teamId, callerId);
+    if (callerRole !== 'owner') {
+      throw new AppError('Only the team workspace owner can delete this workspace.', 403);
+    }
+
+    await dbRepo.deleteTeam(teamId);
+
+    res.status(200).json({
+      success: true,
+      message: `Team workspace "${team.name}" deleted successfully.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+

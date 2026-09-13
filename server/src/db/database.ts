@@ -255,6 +255,30 @@ export const dbRepo = {
     }
   },
 
+  async deleteTeam(teamId: string): Promise<void> {
+    if (isPostgres) {
+      const sql = getNeonSql();
+      await sql`DELETE FROM tasks WHERE team_id = ${teamId}`;
+      await sql`DELETE FROM team_invitations WHERE team_id = ${teamId}`;
+      await sql`DELETE FROM team_members WHERE team_id = ${teamId}`;
+      await sql`DELETE FROM teams WHERE id = ${teamId}`;
+    } else {
+      const db = getSqliteDatabase();
+      const deleteTasks = db.prepare('DELETE FROM tasks WHERE team_id = ?');
+      const deleteInvites = db.prepare('DELETE FROM team_invitations WHERE team_id = ?');
+      const deleteMembers = db.prepare('DELETE FROM team_members WHERE team_id = ?');
+      const deleteTeamRecord = db.prepare('DELETE FROM teams WHERE id = ?');
+
+      const tx = db.transaction(() => {
+        deleteTasks.run(teamId);
+        deleteInvites.run(teamId);
+        deleteMembers.run(teamId);
+        deleteTeamRecord.run(teamId);
+      });
+      tx();
+    }
+  },
+
   async getTeamById(teamId: string): Promise<TeamDbRecord | null> {
     if (isPostgres) {
       const sql = getNeonSql();

@@ -24,6 +24,7 @@ interface AppContextType {
   pendingInvitations: TeamInvitation[];
   switchTeam: (team: Team) => Promise<void>;
   createTeam: (name: string) => Promise<{ success: boolean; team?: Team; error?: string }>;
+  deleteTeam: (teamId: string) => Promise<{ success: boolean; error?: string }>;
   inviteMember: (email: string, role?: string) => Promise<{ success: boolean; inviteUrl?: string; emailSent?: boolean; emailError?: string; simulated?: boolean; error?: string }>;
   removeMember: (userId: string) => Promise<{ success: boolean; error?: string }>;
   refreshTeamData: () => Promise<void>;
@@ -486,6 +487,38 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [addToast, switchTeam]);
 
+  const deleteTeam = useCallback(async (teamId: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await teamApi.deleteTeam(teamId);
+      // Remove from memory cache
+      delete teamCacheRef.current[teamId];
+
+      // Update teams state
+      const remainingTeams = teams.filter(t => t.id !== teamId);
+      setTeams(remainingTeams);
+
+      // If deleted team was active, switch to next available team
+      if (activeTeam?.id === teamId) {
+        if (remainingTeams.length > 0) {
+          await switchTeam(remainingTeams[0]);
+        } else {
+          setActiveTeam(null);
+          setActiveTeamIdHeader(null);
+          setTeamMembers([]);
+          setPendingInvitations([]);
+          setTasks([]);
+        }
+      }
+
+      addToast('success', res.message || 'Team workspace deleted.');
+      return { success: true };
+    } catch (err: any) {
+      const msg = err.message || 'Failed to delete team workspace.';
+      addToast('error', msg);
+      return { success: false, error: msg };
+    }
+  }, [teams, activeTeam, switchTeam, addToast]);
+
   const inviteMember = useCallback(async (email: string, role = 'member'): Promise<{
     success: boolean;
     inviteUrl?: string;
@@ -682,6 +715,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         pendingInvitations,
         switchTeam,
         createTeam,
+        deleteTeam,
         inviteMember,
         removeMember,
         refreshTeamData,

@@ -107,6 +107,12 @@ export const teamApi = {
     });
   },
 
+  async deleteTeam(teamId: string): Promise<{ message: string }> {
+    return request<{ success: boolean; message: string }>(`/teams/${teamId}`, {
+      method: 'DELETE',
+    });
+  },
+
   async getTeamMembers(teamId: string): Promise<{ members: TeamMember[] }> {
     return request<{ success: boolean; members: TeamMember[] }>(`/teams/${teamId}/members`);
   },
