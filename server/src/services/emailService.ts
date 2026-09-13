@@ -214,32 +214,29 @@ function buildInviteEmailHtml(params: {
  * Creates SMTP transporter if credentials are provided in environment
  */
 function getTransporter(): Transporter | null {
-  // Option 1: Resend API Key
-  if (process.env.RESEND_API_KEY) {
-    return nodemailer.createTransport({
-      host: 'smtp.resend.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: 'resend',
-        pass: process.env.RESEND_API_KEY,
-      },
-    });
-  }
-
-  // Option 2: Pre-configured Service (e.g. gmail, SendGrid, Mailgun)
+  // Option 1: Pre-configured Service (e.g. gmail, SendGrid, Mailgun)
   const service = process.env.SMTP_SERVICE || process.env.EMAIL_SERVICE;
   const user = process.env.SMTP_USER || process.env.EMAIL_USER;
   const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD;
 
-  if (service && user && pass) {
-    return nodemailer.createTransport({
-      service,
-      auth: { user, pass },
-    });
+  if (user && pass) {
+    if (service) {
+      return nodemailer.createTransport({
+        service,
+        auth: { user, pass },
+      });
+    }
+
+    // Default to Gmail if user is an @gmail.com address
+    if (user.endsWith('@gmail.com') || user.endsWith('@googlemail.com')) {
+      return nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user, pass },
+      });
+    }
   }
 
-  // Option 3: Custom SMTP Host & Port
+  // Option 2: Custom SMTP Host & Port
   const host = process.env.SMTP_HOST;
   const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
   const secure = process.env.SMTP_SECURE === 'true' || port === 465;
@@ -250,6 +247,19 @@ function getTransporter(): Transporter | null {
       port,
       secure,
       auth: { user, pass },
+    });
+  }
+
+  // Option 3: Resend SMTP fallback if REST isn't used
+  if (process.env.RESEND_API_KEY && !user) {
+    return nodemailer.createTransport({
+      host: 'smtp.resend.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'resend',
+        pass: process.env.RESEND_API_KEY,
+      },
     });
   }
 
@@ -284,7 +294,41 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
   const fromAddress = process.env.EMAIL_FROM || process.env.SMTP_FROM || defaultFrom;
   const textBody = `${params.inviterName} (${params.inviterEmail}) invited you to join ${params.teamName} on Stride.\n\nAccept your invitation here:\n${inviteUrl}\n\nThis link will expire in 7 days.`;
 
-  // Method 1: Resend Direct HTTPS REST API (Fastest & Most Reliable)
+  const hasSmtpConfig = !!((process.env.SMTP_USER && process.env.SMTP_PASS) || (process.env.EMAIL_USER && process.env.EMAIL_PASS) || process.env.EMAIL_PROVIDER === 'gmail' || process.env.EMAIL_PROVIDER === 'smtp');
+
+  // Method 1: Standard SMTP / Gmail (Sends to ANY email address without domain requirement)
+  if (hasSmtpConfig) {
+    const transporter = getTransporter();
+    if (transporter) {
+      try {
+        const info = await transporter.sendMail({
+          from: fromAddress,
+          to: params.toEmail,
+          subject,
+          html,
+          text: textBody,
+        });
+
+        console.log(`📧 [SMTP/Gmail] Real invitation email delivered to ${params.toEmail}. Message ID: ${info.messageId}`);
+        return {
+          success: true,
+          messageId: info.messageId,
+          simulated: false,
+          inviteUrl,
+        };
+      } catch (err: any) {
+        console.error(`⚠️ [SMTP Dispatch Error] for ${params.toEmail}:`, err.message);
+        return {
+          success: false,
+          error: err.message,
+          simulated: false,
+          inviteUrl,
+        };
+      }
+    }
+  }
+
+  // Method 2: Resend Direct HTTPS REST API
   if (process.env.RESEND_API_KEY) {
     try {
       const response = await fetch('https://api.resend.com/emails', {
