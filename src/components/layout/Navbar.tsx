@@ -26,14 +26,8 @@ const buildingIcon = (
   </svg>
 );
 
-const chevronIcon = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" style={{ width: 13, height: 13 }}>
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
-);
-
 const checkIcon = (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" style={{ width: 14, height: 14, color: 'var(--accent)' }}>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" style={{ width: 14, height: 14 }}>
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
@@ -42,6 +36,13 @@ const plusIcon = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" style={{ width: 14, height: 14 }}>
     <line x1="12" y1="5" x2="12" y2="19" />
     <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+const arrowRightIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" style={{ width: 14, height: 14 }}>
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
   </svg>
 );
 
@@ -62,46 +63,40 @@ export default function Navbar() {
   } = useApp();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isTeamDropdownOpen, setIsTeamDropdownOpen] = useState(false);
+  const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
   const [isCreatingTeam, setIsCreatingTeam] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const teamDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns on outside click
+  // Close profile dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
-      if (teamDropdownRef.current && !teamDropdownRef.current.contains(event.target as Node)) {
-        setIsTeamDropdownOpen(false);
-      }
     }
-    if (isMenuOpen || isTeamDropdownOpen) {
+    if (isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isMenuOpen, isTeamDropdownOpen]);
+  }, [isMenuOpen]);
 
   const handleNav = (page: 'settings' | 'team') => {
     setCurrentPage(page);
     setIsMenuOpen(false);
-    setIsTeamDropdownOpen(false);
   };
 
   const handleLogout = () => {
     setIsMenuOpen(false);
-    setIsTeamDropdownOpen(false);
     logout();
     addToast('info', 'Logged out successfully.');
   };
 
   const handleSelectTeam = async (team: typeof teams[0]) => {
-    setIsTeamDropdownOpen(false);
+    setIsWorkspaceModalOpen(false);
     if (activeTeam?.id !== team.id) {
       await switchTeam(team);
     }
@@ -116,7 +111,7 @@ export default function Navbar() {
     if (res.success) {
       setNewTeamName('');
       setCreateTeamModalOpen(false);
-      setIsTeamDropdownOpen(false);
+      setIsWorkspaceModalOpen(false);
     }
   };
 
@@ -124,59 +119,21 @@ export default function Navbar() {
     <>
       <header className="navbar">
         <div className="navbar-left">
-          {/* Team / Workspace Switcher */}
-          <div className="navbar-team-container" ref={teamDropdownRef}>
+          {/* Team / Workspace Switcher Button */}
+          <div className="navbar-team-container">
             <button
               type="button"
-              className={`navbar-team-btn ${isTeamDropdownOpen ? 'active' : ''}`}
-              onClick={() => setIsTeamDropdownOpen(!isTeamDropdownOpen)}
-              title="Switch Workspace / Team"
+              className="navbar-team-btn"
+              onClick={() => setIsWorkspaceModalOpen(true)}
+              title="Click to view all team workspaces"
               aria-label="Workspace Switcher"
-              aria-expanded={isTeamDropdownOpen}
             >
               <span className="navbar-team-icon">{buildingIcon}</span>
               <span className="navbar-team-name">{activeTeam?.name || 'My Workspace'}</span>
-              <span className={`navbar-team-chevron ${isTeamDropdownOpen ? 'open' : ''}`}>{chevronIcon}</span>
+              <span className={`navbar-team-pill-badge role-${activeTeam?.role || 'member'}`}>
+                {activeTeam?.role || 'Team'}
+              </span>
             </button>
-
-            {isTeamDropdownOpen && (
-              <div className="navbar-team-dropdown" role="menu">
-                <div className="dropdown-section-title">Workspaces & Teams</div>
-                <div className="dropdown-team-list">
-                  {teams.map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      className={`dropdown-team-item ${activeTeam?.id === t.id ? 'active' : ''}`}
-                      onClick={() => handleSelectTeam(t)}
-                    >
-                      <div className="dropdown-team-item-info">
-                        <span className="dropdown-team-item-icon">{buildingIcon}</span>
-                        <div className="dropdown-team-item-text">
-                          <span className="dropdown-team-item-name">{t.name}</span>
-                          <span className="dropdown-team-item-role">{t.role || 'Member'}</span>
-                        </div>
-                      </div>
-                      {activeTeam?.id === t.id && <span className="dropdown-team-active-check">{checkIcon}</span>}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="dropdown-divider" />
-
-                <button
-                  type="button"
-                  className="dropdown-item dropdown-create-team-btn"
-                  onClick={() => {
-                    setIsTeamDropdownOpen(false);
-                    setCreateTeamModalOpen(true);
-                  }}
-                >
-                  {plusIcon}
-                  <span>Create New Team</span>
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Search bar */}
@@ -271,6 +228,94 @@ export default function Navbar() {
         </div>
       </header>
 
+      {/* Card-Wise Workspace Switcher Modal */}
+      {isWorkspaceModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsWorkspaceModalOpen(false)}>
+          <div className="modal-card workspace-selector-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-header-icon">{buildingIcon}</div>
+              <div>
+                <h2 className="modal-title">Select Team Workspace</h2>
+                <p className="modal-subtitle">Click on any workspace card below to enter and collaborate.</p>
+              </div>
+            </div>
+
+            <div className="workspace-cards-grid">
+              {teams.map((t) => {
+                const isActive = activeTeam?.id === t.id;
+                return (
+                  <div
+                    key={t.id}
+                    className={`workspace-card-item ${isActive ? 'is-active' : ''}`}
+                    onClick={() => handleSelectTeam(t)}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="workspace-card-top">
+                      <div className="workspace-card-icon">
+                        {t.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="workspace-card-details">
+                        <span className="workspace-card-title">{t.name}</span>
+                        <div className="workspace-card-tags">
+                          <span className={`workspace-card-role-badge role-${t.role || 'member'}`}>
+                            {t.role || 'Member'}
+                          </span>
+                          <span className="workspace-card-count">
+                            {t.member_count || 1} {t.member_count === 1 ? 'member' : 'members'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="workspace-card-bottom">
+                      {isActive ? (
+                        <div className="workspace-card-active-pill">
+                          {checkIcon}
+                          <span>Currently Active</span>
+                        </div>
+                      ) : (
+                        <div className="workspace-card-enter-btn">
+                          <span>Enter Workspace</span>
+                          {arrowRightIcon}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* + Create Team Action Card */}
+              <div
+                className="workspace-card-item workspace-create-card-item"
+                onClick={() => {
+                  setIsWorkspaceModalOpen(false);
+                  setCreateTeamModalOpen(true);
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="workspace-create-inner">
+                  <div className="workspace-create-icon">{plusIcon}</div>
+                  <span className="workspace-create-title">Create New Team</span>
+                  <span className="workspace-create-desc">Set up a dedicated workspace for your project</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer" style={{ marginTop: 20 }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setIsWorkspaceModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Create Team Modal */}
       {isCreateTeamModalOpen && (
         <div className="modal-overlay" onClick={() => setCreateTeamModalOpen(false)}>
@@ -321,4 +366,5 @@ export default function Navbar() {
     </>
   );
 }
+
 

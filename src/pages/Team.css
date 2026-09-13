@@ -9,6 +9,29 @@
   padding-bottom: 40px;
 }
 
+.team-section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.team-main-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.team-main-desc {
+  font-size: 13.5px;
+  color: var(--text-tertiary);
+  margin: 4px 0 0;
+}
+
 .team-header {
   display: flex;
   align-items: flex-start;
@@ -31,8 +54,9 @@
   gap: 12px;
 }
 
-.team-title-row h1 {
-  font-size: 24px;
+.team-title-row h1,
+.team-title-row h2 {
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;

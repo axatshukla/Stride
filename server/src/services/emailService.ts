@@ -215,9 +215,33 @@ function buildInviteEmailHtml(params: {
  * Creates SMTP transporter if credentials are provided in environment
  */
 function getTransporter(): Transporter | null {
+  // Option 1: Resend API Key
+  if (process.env.RESEND_API_KEY) {
+    return nodemailer.createTransport({
+      host: 'smtp.resend.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'resend',
+        pass: process.env.RESEND_API_KEY,
+      },
+    });
+  }
+
+  // Option 2: Pre-configured Service (e.g. gmail, SendGrid, Mailgun)
+  const service = process.env.SMTP_SERVICE || process.env.EMAIL_SERVICE;
+  const user = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD;
+
+  if (service && user && pass) {
+    return nodemailer.createTransport({
+      service,
+      auth: { user, pass },
+    });
+  }
+
+  // Option 3: Custom SMTP Host & Port
   const host = process.env.SMTP_HOST;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
   const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
   const secure = process.env.SMTP_SECURE === 'true' || port === 465;
 
@@ -256,7 +280,7 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
   });
 
   const subject = `${params.inviterName} invited you to join ${params.teamName} on Stride`;
-  const fromAddress = process.env.EMAIL_FROM || `Stride Notifications <${params.inviterEmail || 'no-reply@stride.app'}>`;
+  const fromAddress = process.env.EMAIL_FROM || process.env.SMTP_FROM || `Stride <${process.env.SMTP_USER || params.inviterEmail || 'no-reply@stride.app'}>`;
 
   const transporter = getTransporter();
 

@@ -42,11 +42,13 @@ const trashIcon = (
 
 export default function Team() {
   const {
+    teams,
     activeTeam,
     teamMembers,
     pendingInvitations,
     tasks,
     currentUser,
+    switchTeam,
     inviteMember,
     removeMember,
     setCreateTeamModalOpen,
@@ -92,53 +94,121 @@ export default function Team() {
     await removeMember(memberId);
   };
 
+  const handleSwitchTeam = async (team: typeof teams[0]) => {
+    if (activeTeam?.id !== team.id) {
+      await switchTeam(team);
+    }
+  };
+
   return (
     <div className="team-page">
-      {/* Team Header */}
-      <div className="team-header">
-        <div className="team-header-details">
-          <div className="team-title-row">
-            <h1>{activeTeam?.name || 'My Workspace'}</h1>
-            {activeTeam?.role && (
-              <span className={`team-role-pill role-${activeTeam.role}`}>
-                {activeTeam.role}
-              </span>
-            )}
+      {/* 1. Team Workspaces Section (Card Grid) */}
+      <div className="team-section">
+        <div className="team-section-header-row">
+          <div>
+            <h1 className="team-main-title">Team Workspaces ({teams.length})</h1>
+            <p className="team-main-desc">Select any team card below to enter that workspace and manage its sprint tasks.</p>
           </div>
-          <p>Manage members, collaborate on workspace tasks, and invite new teammates via email.</p>
-        </div>
-
-        <div className="team-header-actions">
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-primary"
             onClick={() => setCreateTeamModalOpen(true)}
           >
             {plusIcon}
-            <span>New Team</span>
+            <span>Create New Team</span>
           </button>
+        </div>
 
-          {isOwnerOrAdmin && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => {
-                setLastInviteResult(null);
-                setIsInviteModalOpen(true);
-              }}
-            >
-              {mailIcon}
-              <span>Invite Member</span>
-            </button>
-          )}
+        <div className="workspace-cards-grid">
+          {teams.map((t) => {
+            const isActive = activeTeam?.id === t.id;
+            return (
+              <div
+                key={t.id}
+                className={`workspace-card-item ${isActive ? 'is-active' : ''}`}
+                onClick={() => handleSwitchTeam(t)}
+                role="button"
+                tabIndex={0}
+              >
+                <div className="workspace-card-top">
+                  <div className="workspace-card-icon">
+                    {t.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="workspace-card-details">
+                    <span className="workspace-card-title">{t.name}</span>
+                    <div className="workspace-card-tags">
+                      <span className={`workspace-card-role-badge role-${t.role || 'member'}`}>
+                        {t.role || 'Member'}
+                      </span>
+                      <span className="workspace-card-count">
+                        {t.member_count || 1} {t.member_count === 1 ? 'member' : 'members'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="workspace-card-bottom">
+                  {isActive ? (
+                    <div className="workspace-card-active-pill">
+                      {checkIcon}
+                      <span>Active Workspace</span>
+                    </div>
+                  ) : (
+                    <div className="workspace-card-enter-btn">
+                      <span>Enter Workspace &rarr;</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Create Team Card */}
+          <div
+            className="workspace-card-item workspace-create-card-item"
+            onClick={() => setCreateTeamModalOpen(true)}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="workspace-create-inner">
+              <div className="workspace-create-icon">{plusIcon}</div>
+              <span className="workspace-create-title">Create New Team</span>
+              <span className="workspace-create-desc">Set up a dedicated workspace for a new project</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Member Roster Grid */}
-      <div className="team-section">
-        <div className="team-section-header">
-          <h2>Active Members ({teamMembers.length})</h2>
-          <span className="team-section-sub">Team members collaborating within this workspace.</span>
+      {/* 2. Active Workspace Members Roster */}
+      <div className="team-section" style={{ marginTop: 12 }}>
+        <div className="team-header">
+          <div className="team-header-details">
+            <div className="team-title-row">
+              <h2>{activeTeam?.name || 'Workspace'} Members ({teamMembers.length})</h2>
+              {activeTeam?.role && (
+                <span className={`team-role-pill role-${activeTeam.role}`}>
+                  Your Role: {activeTeam.role}
+                </span>
+              )}
+            </div>
+            <p>Collaborators and real-time deliverable metrics for {activeTeam?.name}.</p>
+          </div>
+
+          <div className="team-header-actions">
+            {isOwnerOrAdmin && (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => {
+                  setLastInviteResult(null);
+                  setIsInviteModalOpen(true);
+                }}
+              >
+                {mailIcon}
+                <span>Invite Member</span>
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="team-grid">
