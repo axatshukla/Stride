@@ -318,14 +318,24 @@ export default function Team() {
       {isInviteModalOpen && (
         <div className="modal-overlay" onClick={() => setIsInviteModalOpen(false)}>
           <div className="modal-card invite-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-header-icon">{mailIcon}</div>
-              <div>
-                <h2 className="modal-title">Invite Team Member</h2>
-                <p className="modal-subtitle">
-                  Send a collaboration invitation to join <strong>{activeTeam?.name}</strong>.
-                </p>
+            <div className="workspace-modal-header">
+              <div className="workspace-modal-header-left">
+                <div className="workspace-modal-icon-badge">{mailIcon}</div>
+                <div className="workspace-modal-title-group">
+                  <h2 className="workspace-modal-title">Invite Team Member</h2>
+                  <p className="workspace-modal-subtitle">
+                    Send a collaboration invitation to join <strong>{activeTeam?.name}</strong>.
+                  </p>
+                </div>
               </div>
+              <button
+                type="button"
+                className="workspace-modal-close-btn"
+                onClick={() => setIsInviteModalOpen(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
             </div>
 
             {lastInviteResult ? (
@@ -333,7 +343,7 @@ export default function Team() {
                 {lastInviteResult.emailSent !== false ? (
                   <div className="invite-success-badge">
                     {checkIcon}
-                    <span>Invitation Email Dispatched via Resend!</span>
+                    <span>Invitation Email Dispatched!</span>
                   </div>
                 ) : (
                   <div className="invite-warning-badge" style={{ background: '#FFFBEB', color: '#D97706', border: '1px solid #FDE68A', padding: '6px 12px', borderRadius: 'var(--radius-md)', fontSize: '13px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>

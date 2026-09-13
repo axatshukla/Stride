@@ -532,18 +532,145 @@
 }
 
 /* ============================================================
-   Create Team Modal Dialog
+   Workspace & Create Team Modal Overlays & Dialogs
    ============================================================ */
 
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 16px;
+  animation: modalFadeIn 0.15s ease-out forwards;
+}
+
+.modal-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  animation: modalScaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.workspace-selector-modal {
+  max-width: 680px;
+  width: 100%;
+}
+
 .create-team-modal {
-  max-width: 440px;
+  max-width: 480px;
+  width: 100%;
+}
+
+.workspace-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.workspace-modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.workspace-modal-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #EEF2FF;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.15);
+}
+
+.workspace-modal-icon-badge svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.workspace-modal-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.workspace-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.workspace-modal-subtitle {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.workspace-modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #FFFFFF;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.12s ease;
+  flex-shrink: 0;
+}
+
+.workspace-modal-close-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
 .create-team-form {
-  margin-top: 16px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+}
+
+.create-team-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.workspace-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
 }
 
 @media (max-width: 1023px) {

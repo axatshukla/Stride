@@ -232,12 +232,22 @@ export default function Navbar() {
       {isWorkspaceModalOpen && (
         <div className="modal-overlay" onClick={() => setIsWorkspaceModalOpen(false)}>
           <div className="modal-card workspace-selector-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-header-icon">{buildingIcon}</div>
-              <div>
-                <h2 className="modal-title">Select Team Workspace</h2>
-                <p className="modal-subtitle">Click on any workspace card below to enter and collaborate.</p>
+            <div className="workspace-modal-header">
+              <div className="workspace-modal-header-left">
+                <div className="workspace-modal-icon-badge">{buildingIcon}</div>
+                <div className="workspace-modal-title-group">
+                  <h2 className="workspace-modal-title">Select Team Workspace</h2>
+                  <p className="workspace-modal-subtitle">Click on any workspace card below to enter and collaborate.</p>
+                </div>
               </div>
+              <button
+                type="button"
+                className="workspace-modal-close-btn"
+                onClick={() => setIsWorkspaceModalOpen(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
             </div>
 
             <div className="workspace-cards-grid">
@@ -303,7 +313,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            <div className="modal-footer" style={{ marginTop: 20 }}>
+            <div className="workspace-modal-footer">
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -320,12 +330,22 @@ export default function Navbar() {
       {isCreateTeamModalOpen && (
         <div className="modal-overlay" onClick={() => setCreateTeamModalOpen(false)}>
           <div className="modal-card create-team-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div className="modal-header-icon">{buildingIcon}</div>
-              <div>
-                <h2 className="modal-title">Create New Team Workspace</h2>
-                <p className="modal-subtitle">Collaborate with team members on dedicated projects and tasks.</p>
+            <div className="workspace-modal-header">
+              <div className="workspace-modal-header-left">
+                <div className="workspace-modal-icon-badge">{buildingIcon}</div>
+                <div className="workspace-modal-title-group">
+                  <h2 className="workspace-modal-title">Create New Team Workspace</h2>
+                  <p className="workspace-modal-subtitle">Collaborate with team members on dedicated projects and tasks.</p>
+                </div>
               </div>
+              <button
+                type="button"
+                className="workspace-modal-close-btn"
+                onClick={() => setCreateTeamModalOpen(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
             </div>
 
             <form onSubmit={handleCreateTeamSubmit} className="create-team-form">
@@ -343,7 +363,7 @@ export default function Navbar() {
                 />
               </div>
 
-              <div className="modal-footer">
+              <div className="create-team-modal-actions">
                 <button
                   type="button"
                   className="btn btn-secondary"
