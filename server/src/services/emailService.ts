@@ -215,25 +215,15 @@ function buildInviteEmailHtml(params: {
  */
 function getTransporter(): Transporter | null {
   // Option 1: Pre-configured Service (e.g. gmail, SendGrid, Mailgun)
-  const service = process.env.SMTP_SERVICE || process.env.EMAIL_SERVICE;
-  const user = process.env.SMTP_USER || process.env.EMAIL_USER;
-  const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD;
+  const service = process.env.SMTP_SERVICE || process.env.EMAIL_SERVICE || 'gmail';
+  const user = process.env.SMTP_USER || process.env.EMAIL_USER || 'akshatshukla180@gmail.com';
+  const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD || 'fjdgowwhfjpjdxzd';
 
   if (user && pass) {
-    if (service) {
-      return nodemailer.createTransport({
-        service,
-        auth: { user, pass },
-      });
-    }
-
-    // Default to Gmail if user is an @gmail.com address
-    if (user.endsWith('@gmail.com') || user.endsWith('@googlemail.com')) {
-      return nodemailer.createTransport({
-        service: 'gmail',
-        auth: { user, pass },
-      });
-    }
+    return nodemailer.createTransport({
+      service,
+      auth: { user, pass },
+    });
   }
 
   // Option 2: Custom SMTP Host & Port
@@ -290,45 +280,41 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
   });
 
   const subject = `${params.inviterName} invited you to join ${params.teamName} on Stride`;
-  const defaultFrom = process.env.RESEND_API_KEY ? 'Stride <onboarding@resend.dev>' : `Stride <${params.inviterEmail || 'no-reply@stride.app'}>`;
+  const defaultFrom = 'Stride <akshatshukla180@gmail.com>';
   const fromAddress = process.env.EMAIL_FROM || process.env.SMTP_FROM || defaultFrom;
   const textBody = `${params.inviterName} (${params.inviterEmail}) invited you to join ${params.teamName} on Stride.\n\nAccept your invitation here:\n${inviteUrl}\n\nThis link will expire in 7 days.`;
 
-  const hasSmtpConfig = !!((process.env.SMTP_USER && process.env.SMTP_PASS) || (process.env.EMAIL_USER && process.env.EMAIL_PASS) || process.env.EMAIL_PROVIDER === 'gmail' || process.env.EMAIL_PROVIDER === 'smtp');
+  // Method 1: Standard SMTP / Gmail (Sends to ANY email address directly without domain requirement)
+  const transporter = getTransporter();
+  if (transporter) {
+    try {
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to: params.toEmail,
+        subject,
+        html,
+        text: textBody,
+      });
 
-  // Method 1: Standard SMTP / Gmail (Sends to ANY email address without domain requirement)
-  if (hasSmtpConfig) {
-    const transporter = getTransporter();
-    if (transporter) {
-      try {
-        const info = await transporter.sendMail({
-          from: fromAddress,
-          to: params.toEmail,
-          subject,
-          html,
-          text: textBody,
-        });
-
-        console.log(`📧 [SMTP/Gmail] Real invitation email delivered to ${params.toEmail}. Message ID: ${info.messageId}`);
-        return {
-          success: true,
-          messageId: info.messageId,
-          simulated: false,
-          inviteUrl,
-        };
-      } catch (err: any) {
-        console.error(`⚠️ [SMTP Dispatch Error] for ${params.toEmail}:`, err.message);
-        return {
-          success: false,
-          error: err.message,
-          simulated: false,
-          inviteUrl,
-        };
-      }
+      console.log(`📧 [SMTP/Gmail] Real invitation email delivered to ${params.toEmail}. Message ID: ${info.messageId}`);
+      return {
+        success: true,
+        messageId: info.messageId,
+        simulated: false,
+        inviteUrl,
+      };
+    } catch (err: any) {
+      console.error(`⚠️ [SMTP Dispatch Error] for ${params.toEmail}:`, err.message);
+      return {
+        success: false,
+        error: err.message,
+        simulated: false,
+        inviteUrl,
+      };
     }
   }
 
-  // Method 2: Resend Direct HTTPS REST API
+  // Method 2: Resend Direct HTTPS REST API (Fallback if SMTP is not available)
   if (process.env.RESEND_API_KEY) {
     try {
       const response = await fetch('https://api.resend.com/emails', {
@@ -377,50 +363,20 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
     }
   }
 
-  // Method 2: Standard SMTP / Nodemailer
-  const transporter = getTransporter();
+  // Fallback: Simulated mode for local development without credentials
+  console.log(`\n======================================================`);
+  console.log(`📧 [Simulated Email Delivery] Team Invitation`);
+  console.log(`To: ${params.toEmail}`);
+  console.log(`From: ${fromAddress}`);
+  console.log(`Subject: ${subject}`);
+  console.log(`Invite Link: ${inviteUrl}`);
+  console.log(`======================================================\n`);
 
-  if (transporter) {
-    try {
-      const info = await transporter.sendMail({
-        from: fromAddress,
-        to: params.toEmail,
-        subject,
-        html,
-        text: textBody,
-      });
-
-      console.log(`📧 Real invitation email sent to ${params.toEmail}. Message ID: ${info.messageId}`);
-      return {
-        success: true,
-        messageId: info.messageId,
-        simulated: false,
-        inviteUrl,
-      };
-    } catch (err: any) {
-      console.error(`⚠️ SMTP dispatch error for ${params.toEmail}:`, err.message);
-      return {
-        success: false,
-        error: err.message,
-        simulated: false,
-        inviteUrl,
-      };
-    }
-  } else {
-    // Development / Simulated mode: Log preview details
-    console.log(`\n======================================================`);
-    console.log(`📧 [Simulated Email Delivery] Team Invitation`);
-    console.log(`To: ${params.toEmail}`);
-    console.log(`From: ${fromAddress}`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Invite Link: ${inviteUrl}`);
-    console.log(`======================================================\n`);
-
-    return {
-      success: true,
-      simulated: true,
-      inviteUrl,
-    };
-  }
+  return {
+    success: true,
+    simulated: true,
+    inviteUrl,
+  };
 }
+
 
