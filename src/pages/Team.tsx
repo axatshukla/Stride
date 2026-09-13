@@ -59,7 +59,7 @@ export default function Team() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('member');
   const [isSendingInvite, setIsSendingInvite] = useState(false);
-  const [lastInviteResult, setLastInviteResult] = useState<{ inviteUrl?: string; simulated?: boolean } | null>(null);
+  const [lastInviteResult, setLastInviteResult] = useState<{ inviteUrl?: string; simulated?: boolean; emailSent?: boolean; emailError?: string } | null>(null);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
   const isOwnerOrAdmin = activeTeam?.role === 'owner' || activeTeam?.role === 'admin';
@@ -76,6 +76,8 @@ export default function Team() {
     if (res.success) {
       setLastInviteResult({
         inviteUrl: res.inviteUrl,
+        emailSent: res.emailSent,
+        emailError: res.emailError,
         simulated: res.simulated,
       });
       setInviteEmail('');
@@ -328,13 +330,26 @@ export default function Team() {
 
             {lastInviteResult ? (
               <div className="invite-success-box">
-                <div className="invite-success-badge">
-                  {checkIcon}
-                  <span>Invitation Email Dispatched!</span>
-                </div>
-                <p className="invite-success-text">
-                  An email with instructions and join link has been sent. You can also share the direct link below:
-                </p>
+                {lastInviteResult.emailSent !== false ? (
+                  <div className="invite-success-badge">
+                    {checkIcon}
+                    <span>Invitation Email Dispatched via Resend!</span>
+                  </div>
+                ) : (
+                  <div className="invite-warning-badge" style={{ background: '#FFFBEB', color: '#D97706', border: '1px solid #FDE68A', padding: '6px 12px', borderRadius: 'var(--radius-md)', fontSize: '13px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span>⚠️ Email Provider Notice</span>
+                  </div>
+                )}
+
+                {lastInviteResult.emailError ? (
+                  <div style={{ background: '#FFFDF5', border: '1px solid #FEF08A', padding: '10px 12px', borderRadius: 'var(--radius-md)', fontSize: '12px', color: '#854D0E', lineHeight: 1.5 }}>
+                    <strong>Resend Sandbox Notice:</strong> {lastInviteResult.emailError}
+                  </div>
+                ) : (
+                  <p className="invite-success-text">
+                    An email with join instructions has been sent. You can also share the direct link below:
+                  </p>
+                )}
                 {lastInviteResult.inviteUrl && (
                   <div className="invite-link-preview">
                     <input

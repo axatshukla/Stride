@@ -24,7 +24,7 @@ interface AppContextType {
   pendingInvitations: TeamInvitation[];
   switchTeam: (team: Team) => Promise<void>;
   createTeam: (name: string) => Promise<{ success: boolean; team?: Team; error?: string }>;
-  inviteMember: (email: string, role?: string) => Promise<{ success: boolean; inviteUrl?: string; simulated?: boolean; error?: string }>;
+  inviteMember: (email: string, role?: string) => Promise<{ success: boolean; inviteUrl?: string; emailSent?: boolean; emailError?: string; simulated?: boolean; error?: string }>;
   removeMember: (userId: string) => Promise<{ success: boolean; error?: string }>;
   refreshTeamData: () => Promise<void>;
   acceptInviteToken: (token: string) => Promise<{ success: boolean; team?: Team; error?: string }>;
@@ -437,6 +437,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const inviteMember = useCallback(async (email: string, role = 'member'): Promise<{
     success: boolean;
     inviteUrl?: string;
+    emailSent?: boolean;
+    emailError?: string;
     simulated?: boolean;
     error?: string;
   }> => {
@@ -449,10 +451,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // Refresh pending invitations
       const invitesRes = await teamApi.getPendingInvitations(activeTeam.id);
       setPendingInvitations(invitesRes.invitations);
-      addToast('success', `Invitation email sent to ${email}!`);
+
+      if (res.emailSent === false) {
+        addToast('info', `Invitation generated for ${email}. (Email notice: ${res.emailError || 'Provider warning'})`);
+      } else {
+        addToast('success', `Invitation email sent to ${email}!`);
+      }
+
       return {
         success: true,
         inviteUrl: res.inviteUrl,
+        emailSent: res.emailSent,
+        emailError: res.emailError,
         simulated: res.simulated,
       };
     } catch (err: any) {

@@ -181,7 +181,11 @@ export async function inviteMember(req: Request, res: Response, next: NextFuncti
 
     res.status(200).json({
       success: true,
-      message: `Invitation email sent to ${cleanEmail}.`,
+      emailSent: emailResult.success,
+      emailError: emailResult.error,
+      message: emailResult.success
+        ? `Invitation email sent to ${cleanEmail}.`
+        : `Invitation created, but email could not be delivered: ${emailResult.error || 'Check email configuration.'}`,
       inviteUrl: emailResult.inviteUrl,
       simulated: emailResult.simulated,
     });

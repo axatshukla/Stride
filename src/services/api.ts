@@ -113,12 +113,16 @@ export const teamApi = {
 
   async inviteMember(teamId: string, email: string, role = 'member'): Promise<{
     success: boolean;
+    emailSent?: boolean;
+    emailError?: string;
     message: string;
     inviteUrl: string;
     simulated: boolean;
   }> {
     return request<{
       success: boolean;
+      emailSent?: boolean;
+      emailError?: string;
       message: string;
       inviteUrl: string;
       simulated: boolean;

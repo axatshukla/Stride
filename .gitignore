@@ -27,4 +27,6 @@ server/data/*.db*
 server/data/*.db-shm
 server/data/*.db-wal
 .netlify
-
+.env
+.env.*
+!.env.example

@@ -262,6 +262,7 @@ function getTransporter(): Transporter | null {
 export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promise<{
   success: boolean;
   messageId?: string;
+  error?: string;
   simulated: boolean;
   inviteUrl: string;
 }> {
@@ -312,10 +313,23 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
           inviteUrl,
         };
       } else {
-        console.warn(`⚠️ [Resend API Error]:`, resData);
+        const errorMsg = resData.message || resData.error || 'Resend API rejected email.';
+        console.warn(`⚠️ [Resend API Error]:`, errorMsg);
+        return {
+          success: false,
+          error: errorMsg,
+          simulated: false,
+          inviteUrl,
+        };
       }
     } catch (apiErr: any) {
       console.error(`⚠️ [Resend Dispatch Error]:`, apiErr.message);
+      return {
+        success: false,
+        error: apiErr.message,
+        simulated: false,
+        inviteUrl,
+      };
     }
   }
 
@@ -341,9 +355,9 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
       };
     } catch (err: any) {
       console.error(`⚠️ SMTP dispatch error for ${params.toEmail}:`, err.message);
-      // Return URL fallback so user can still share the generated link
       return {
         success: false,
+        error: err.message,
         simulated: false,
         inviteUrl,
       };
@@ -365,3 +379,4 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
     };
   }
 }
+
