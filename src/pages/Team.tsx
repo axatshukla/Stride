@@ -1,64 +1,360 @@
+// ============================================================
+// Team Page — Multi-Tenant Member Roster & Email Invitations
+// ============================================================
+
+import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import './Team.css';
 
-export default function Team() {
-  const { users, tasks } = useApp();
+const mailIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" style={{ width: 16, height: 16 }}>
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <polyline points="22,6 12,13 2,6" />
+  </svg>
+);
 
-  const roles: Record<string, string> = {
-    u1: 'Lead Full-Stack Engineer',
-    u2: 'Senior UI/UX Designer',
-    u3: 'Backend & Security Engineer',
-    u4: 'DevOps & QA Engineer',
-    u5: 'Full-Stack Developer',
+const plusIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" style={{ width: 15, height: 15 }}>
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+const copyIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" style={{ width: 14, height: 14 }}>
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </svg>
+);
+
+const checkIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" style={{ width: 14, height: 14 }}>
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+const trashIcon = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" style={{ width: 14, height: 14 }}>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+
+export default function Team() {
+  const {
+    activeTeam,
+    teamMembers,
+    pendingInvitations,
+    tasks,
+    currentUser,
+    inviteMember,
+    removeMember,
+    setCreateTeamModalOpen,
+    addToast
+  } = useApp();
+
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('member');
+  const [isSendingInvite, setIsSendingInvite] = useState(false);
+  const [lastInviteResult, setLastInviteResult] = useState<{ inviteUrl?: string; simulated?: boolean } | null>(null);
+  const [copiedToken, setCopiedToken] = useState<string | null>(null);
+
+  const isOwnerOrAdmin = activeTeam?.role === 'owner' || activeTeam?.role === 'admin';
+
+  const handleSendInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail.trim()) return;
+    setIsSendingInvite(true);
+    setLastInviteResult(null);
+
+    const res = await inviteMember(inviteEmail.trim(), inviteRole);
+    setIsSendingInvite(false);
+
+    if (res.success) {
+      setLastInviteResult({
+        inviteUrl: res.inviteUrl,
+        simulated: res.simulated,
+      });
+      setInviteEmail('');
+    }
+  };
+
+  const handleCopyLink = (url: string, id: string) => {
+    navigator.clipboard.writeText(url);
+    setCopiedToken(id);
+    addToast('success', 'Invitation link copied to clipboard!');
+    setTimeout(() => setCopiedToken(null), 3000);
+  };
+
+  const handleRemoveMember = async (memberId: string, memberName: string) => {
+    if (!window.confirm(`Are you sure you want to remove ${memberName} from this team workspace?`)) return;
+    await removeMember(memberId);
   };
 
   return (
     <div className="team-page">
+      {/* Team Header */}
       <div className="team-header">
-        <div>
-          <h1>Team & Collaborators</h1>
-          <p>Workspace members, roles, and real-time deliverable capacity.</p>
+        <div className="team-header-details">
+          <div className="team-title-row">
+            <h1>{activeTeam?.name || 'My Workspace'}</h1>
+            {activeTeam?.role && (
+              <span className={`team-role-pill role-${activeTeam.role}`}>
+                {activeTeam.role}
+              </span>
+            )}
+          </div>
+          <p>Manage members, collaborate on workspace tasks, and invite new teammates via email.</p>
+        </div>
+
+        <div className="team-header-actions">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setCreateTeamModalOpen(true)}
+          >
+            {plusIcon}
+            <span>New Team</span>
+          </button>
+
+          {isOwnerOrAdmin && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                setLastInviteResult(null);
+                setIsInviteModalOpen(true);
+              }}
+            >
+              {mailIcon}
+              <span>Invite Member</span>
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="team-grid">
-        {users.map(user => {
-          const userTasks = tasks.filter(t => t.assignee?.id === user.id);
-          const activeTasks = userTasks.filter(t => t.status === 'in-progress').length;
-          const completedTasks = userTasks.filter(t => t.status === 'done').length;
+      {/* Member Roster Grid */}
+      <div className="team-section">
+        <div className="team-section-header">
+          <h2>Active Members ({teamMembers.length})</h2>
+          <span className="team-section-sub">Team members collaborating within this workspace.</span>
+        </div>
 
-          return (
-            <div key={user.id} className="team-card">
-              <div className="team-card-top">
-                <div className="team-avatar-lg" style={{ background: user.color || 'var(--accent)' }}>
-                  {user.initials}
+        <div className="team-grid">
+          {teamMembers.map(member => {
+            const memberTasks = tasks.filter(t => t.assignee?.id === member.id);
+            const activeTasks = memberTasks.filter(t => t.status === 'in-progress').length;
+            const completedTasks = memberTasks.filter(t => t.status === 'done').length;
+            const isCurrentUser = member.id === currentUser?.id;
+            const canRemove = isOwnerOrAdmin && !isCurrentUser && member.role !== 'owner';
+
+            return (
+              <div key={member.id} className="team-card">
+                <div className="team-card-top">
+                  <div className="team-avatar-lg" style={{ background: member.color || 'var(--accent)' }}>
+                    {member.initials}
+                  </div>
+                  <div className="team-card-info">
+                    <div className="team-card-name-row">
+                      <span className="team-card-name">{member.name}</span>
+                      {isCurrentUser && <span className="team-you-tag">You</span>}
+                    </div>
+                    <span className={`team-card-member-role role-${member.role || 'member'}`}>
+                      {member.role || 'Member'}
+                    </span>
+                  </div>
+
+                  {canRemove && (
+                    <button
+                      type="button"
+                      className="team-member-remove-btn"
+                      onClick={() => handleRemoveMember(member.id, member.name || 'this member')}
+                      title="Remove member from workspace"
+                    >
+                      {trashIcon}
+                    </button>
+                  )}
                 </div>
-                <div className="team-card-info">
-                  <span className="team-card-name">{user.name}</span>
-                  <span className="team-card-role">{roles[user.id] || 'Workspace Member'}</span>
+
+                <div className="team-card-email">{member.email}</div>
+
+                <div className="team-card-metrics">
+                  <div className="team-card-stat">
+                    <span className="team-card-stat-val">{memberTasks.length}</span>
+                    <span className="team-card-stat-lbl">Assigned</span>
+                  </div>
+                  <div className="team-card-stat">
+                    <span className="team-card-stat-val" style={{ color: 'var(--status-progress)' }}>{activeTasks}</span>
+                    <span className="team-card-stat-lbl">In Progress</span>
+                  </div>
+                  <div className="team-card-stat">
+                    <span className="team-card-stat-val" style={{ color: 'var(--status-done)' }}>{completedTasks}</span>
+                    <span className="team-card-stat-lbl">Completed</span>
+                  </div>
                 </div>
               </div>
+            );
+          })}
+        </div>
+      </div>
 
-              <div className="team-card-email">{user.email}</div>
+      {/* Pending Invitations Section */}
+      {pendingInvitations.length > 0 && (
+        <div className="team-section">
+          <div className="team-section-header">
+            <h2>Pending Invitations ({pendingInvitations.length})</h2>
+            <span className="team-section-sub">Awaiting registration or invite link acceptance.</span>
+          </div>
 
-              <div className="team-card-metrics">
-                <div className="team-card-stat">
-                  <span className="team-card-stat-val">{userTasks.length}</span>
-                  <span className="team-card-stat-lbl">Assigned</span>
+          <div className="pending-invitations-list">
+            {pendingInvitations.map((invite) => {
+              const fullInviteUrl = `${window.location.origin}/join?token=${invite.token}`;
+              const isCopied = copiedToken === invite.id;
+
+              return (
+                <div key={invite.id} className="pending-invite-row">
+                  <div className="pending-invite-left">
+                    <div className="pending-invite-icon">{mailIcon}</div>
+                    <div className="pending-invite-info">
+                      <span className="pending-invite-email">{invite.email}</span>
+                      <span className="pending-invite-meta">
+                        Role: <strong>{invite.role}</strong> &bull; Sent {new Date(invite.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pending-invite-actions">
+                    <span className="pending-invite-badge">Pending Delivery / Accept</span>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => handleCopyLink(fullInviteUrl, invite.id)}
+                    >
+                      {isCopied ? checkIcon : copyIcon}
+                      <span>{isCopied ? 'Copied' : 'Copy Link'}</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="team-card-stat">
-                  <span className="team-card-stat-val" style={{ color: 'var(--status-progress)' }}>{activeTasks}</span>
-                  <span className="team-card-stat-lbl">In Progress</span>
-                </div>
-                <div className="team-card-stat">
-                  <span className="team-card-stat-val" style={{ color: 'var(--status-done)' }}>{completedTasks}</span>
-                  <span className="team-card-stat-lbl">Completed</span>
-                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Invite Member Modal */}
+      {isInviteModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsInviteModalOpen(false)}>
+          <div className="modal-card invite-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-header-icon">{mailIcon}</div>
+              <div>
+                <h2 className="modal-title">Invite Team Member</h2>
+                <p className="modal-subtitle">
+                  Send a collaboration invitation to join <strong>{activeTeam?.name}</strong>.
+                </p>
               </div>
             </div>
-          );
-        })}
-      </div>
+
+            {lastInviteResult ? (
+              <div className="invite-success-box">
+                <div className="invite-success-badge">
+                  {checkIcon}
+                  <span>Invitation Email Dispatched!</span>
+                </div>
+                <p className="invite-success-text">
+                  An email with instructions and join link has been sent. You can also share the direct link below:
+                </p>
+                {lastInviteResult.inviteUrl && (
+                  <div className="invite-link-preview">
+                    <input
+                      type="text"
+                      className="form-input invite-link-input"
+                      readOnly
+                      value={lastInviteResult.inviteUrl}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => handleCopyLink(lastInviteResult.inviteUrl!, 'modal-link')}
+                    >
+                      {copiedToken === 'modal-link' ? checkIcon : copyIcon}
+                      <span>{copiedToken === 'modal-link' ? 'Copied' : 'Copy'}</span>
+                    </button>
+                  </div>
+                )}
+
+                <div className="modal-footer" style={{ marginTop: 20 }}>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => {
+                      setLastInviteResult(null);
+                      setIsInviteModalOpen(false);
+                    }}
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSendInvite} className="invite-form">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="inviteEmailInput">Collaborator's Email Address</label>
+                  <input
+                    id="inviteEmailInput"
+                    type="email"
+                    className="form-input"
+                    placeholder="colleague@company.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="inviteRoleSelect">Workspace Role</label>
+                  <select
+                    id="inviteRoleSelect"
+                    className="form-select"
+                    value={inviteRole}
+                    onChange={(e) => setInviteRole(e.target.value)}
+                  >
+                    <option value="member">Member — Can create, edit and complete tasks</option>
+                    <option value="admin">Admin — Can invite collaborators and manage team settings</option>
+                  </select>
+                </div>
+
+                <div className="invite-template-preview-info">
+                  <div className="invite-template-icon">&#9993;</div>
+                  <div className="invite-template-text">
+                    <strong>Production Email Delivery:</strong> Recipient will receive an official branded invitation email with an instant 1-click access token.
+                  </div>
+                </div>
+
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setIsInviteModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isSendingInvite || !inviteEmail.trim()}
+                  >
+                    {isSendingInvite ? 'Sending Email...' : 'Send Invitation'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

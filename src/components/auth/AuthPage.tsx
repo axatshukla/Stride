@@ -22,7 +22,7 @@ const eyeClosedIcon = (
 );
 
 export default function AuthPage() {
-  const { login, signup, addToast } = useApp();
+  const { login, signup, addToast, pendingInviteToken } = useApp();
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -130,6 +130,16 @@ export default function AuthPage() {
             Create Account
           </button>
         </div>
+
+        {pendingInviteToken && (
+          <div className="auth-invite-banner" role="status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 16, height: 16, flexShrink: 0 }}>
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            <span>You have been invited to a team workspace! Sign in or register to join immediately.</span>
+          </div>
+        )}
 
         {errorMsg && (
           <div className="auth-error-banner" role="alert">

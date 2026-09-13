@@ -6,6 +6,7 @@ import { env } from './config/env';
 import { healthRouter } from './routes/healthRoutes';
 import { authRouter } from './routes/authRoutes';
 import { taskRouter } from './routes/taskRoutes';
+import teamRouter from './routes/teamRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
 
@@ -21,7 +22,7 @@ export function createApp(): Express {
       origin: [env.CLIENT_ORIGIN, 'http://localhost:5173', 'http://127.0.0.1:5173'],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'x-team-id'],
     })
   );
 
@@ -39,6 +40,7 @@ export function createApp(): Express {
   // 5. API Routes Mounts
   app.use('/api/health', healthRouter);
   app.use('/api/auth', authRouter);
+  app.use('/api/teams', teamRouter);
   app.use('/api/tasks', taskRouter);
 
   // 6. 404 & Global Error Handling

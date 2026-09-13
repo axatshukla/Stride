@@ -257,6 +257,185 @@
   color: #DC2626;
 }
 
+/* ============================================================
+   Workspace / Team Switcher Styles
+   ============================================================ */
+
+.navbar-team-container {
+  position: relative;
+}
+
+.navbar-team-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.navbar-team-btn:hover,
+.navbar-team-btn.active {
+  background: #FFFFFF;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-muted);
+}
+
+.navbar-team-icon {
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+}
+
+.navbar-team-name {
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-team-chevron {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.navbar-team-chevron.open {
+  transform: rotate(180deg);
+}
+
+.navbar-team-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 260px;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 8px 6px;
+  z-index: 1000;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.dropdown-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  padding: 6px 10px 4px;
+}
+
+.dropdown-team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.dropdown-team-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+}
+
+.dropdown-team-item:hover {
+  background: var(--bg-primary);
+}
+
+.dropdown-team-item.active {
+  background: var(--accent-muted);
+}
+
+.dropdown-team-item-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.dropdown-team-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #EEF2FF;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.dropdown-team-item-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dropdown-team-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-team-item-role {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.dropdown-team-active-check {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.dropdown-create-team-btn {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.dropdown-create-team-btn:hover {
+  background: var(--accent-muted);
+  color: var(--accent);
+}
+
+/* ============================================================
+   Create Team Modal Dialog
+   ============================================================ */
+
+.create-team-modal {
+  max-width: 440px;
+}
+
+.create-team-form {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 @media (max-width: 1023px) {
   .navbar {
     padding-left: calc(var(--space-4) + 40px);
@@ -265,10 +444,14 @@
 }
 
 @media (max-width: 640px) {
+  .navbar-team-name {
+    max-width: 90px;
+  }
   .navbar-search {
-    max-width: 180px;
+    max-width: 140px;
   }
   .navbar-search-kbd {
     display: none;
   }
 }
+

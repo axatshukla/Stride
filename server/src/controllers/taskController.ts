@@ -49,12 +49,14 @@ function formatTask(row: TaskDbRecord) {
 export async function getTasks(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { status, priority, search, sortBy } = req.query;
+    const teamId = (req.headers['x-team-id'] as string) || (req.query.teamId as string) || undefined;
 
     const rows = await dbRepo.getTasks({
       status: status as string,
       priority: priority as string,
       search: search as string,
       sortBy: sortBy as string,
+      teamId,
     });
 
     const tasks = rows.map(formatTask);
@@ -74,9 +76,10 @@ export async function getTasks(req: Request, res: Response, next: NextFunction):
  * @desc    Compute dashboard task statistics
  * @access  Private (Requires Bearer JWT)
  */
-export async function getTaskStats(_req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getTaskStats(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const rows = await dbRepo.getTaskStatsSummary();
+    const teamId = (req.headers['x-team-id'] as string) || (req.query.teamId as string) || undefined;
+    const rows = await dbRepo.getTaskStatsSummary(teamId);
 
     const total = rows.length;
     const todo = rows.filter(r => r.status === 'todo').length;
@@ -143,7 +146,8 @@ export async function getTaskById(req: Request, res: Response, next: NextFunctio
  */
 export async function createTask(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { title, description, status, priority, assignee_id, dueDate, tags } = req.body;
+    const { title, description, status, priority, assignee_id, dueDate, tags, teamId } = req.body;
+    const activeTeamId = teamId || (req.headers['x-team-id'] as string) || null;
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
       throw new AppError('Task title is required.', 400);
@@ -155,8 +159,7 @@ export async function createTask(req: Request, res: Response, next: NextFunction
     const cleanDueDate = dueDate ? new Date(dueDate).toISOString() : null;
 
     // Generate sequence key e.g. TSK-1
-    const totalCount = await dbRepo.getTaskCount();
-    const nextKeyNum = totalCount + 1;
+    const nextKeyNum = await dbRepo.getNextTaskKeyNumber();
     const key = `TSK-${nextKeyNum}`;
     const id = `t_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const now = new Date().toISOString();
@@ -179,6 +182,7 @@ export async function createTask(req: Request, res: Response, next: NextFunction
       priority: cleanPriority,
       assignee_id: cleanAssigneeId,
       created_by: createdBy,
+      team_id: activeTeamId,
       due_date: cleanDueDate,
       tags: cleanTags,
       created_at: now,

@@ -10,7 +10,7 @@ import { hashPassword, comparePassword, generateToken, extractInitials } from '.
  */
 export async function signup(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, inviteToken } = req.body;
 
     // 1. Validation
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -52,7 +52,32 @@ export async function signup(req: Request, res: Response, next: NextFunction): P
       updated_at: now,
     });
 
-    // 5. Generate JWT token
+    // 5. Create default workspace team for user
+    const defaultTeamId = `team_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const defaultTeamName = `${cleanName.split(' ')[0]}'s Workspace`;
+    const defaultSlug = defaultTeamName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    await dbRepo.createTeam({
+      id: defaultTeamId,
+      name: defaultTeamName,
+      slug: defaultSlug,
+      created_by: id,
+      created_at: now,
+      updated_at: now,
+    });
+
+    // 6. If signing up via invite link, auto-accept invitation
+    if (inviteToken && typeof inviteToken === 'string') {
+      try {
+        await dbRepo.acceptInvitation(inviteToken, id);
+      } catch (e) {
+        console.error('Failed to auto-accept invite token on signup:', e);
+      }
+    }
+
+    const teams = await dbRepo.getUserTeams(id);
+
+    // 7. Generate JWT token
     const token = generateToken({ userId: id, email: cleanEmail });
 
     const userPayload = {
@@ -67,6 +92,7 @@ export async function signup(req: Request, res: Response, next: NextFunction): P
       success: true,
       message: 'Account created successfully.',
       user: userPayload,
+      teams,
       token,
     });
   } catch (err) {
@@ -101,7 +127,27 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       throw new AppError('Invalid email or password.', 401);
     }
 
-    // 3. Generate JWT token
+    // 3. Ensure user has at least one team
+    let teams = await dbRepo.getUserTeams(user.id);
+    if (teams.length === 0) {
+      const defaultTeamId = `team_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      const defaultTeamName = `${user.name.split(' ')[0]}'s Workspace`;
+      const defaultSlug = defaultTeamName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const now = new Date().toISOString();
+
+      await dbRepo.createTeam({
+        id: defaultTeamId,
+        name: defaultTeamName,
+        slug: defaultSlug,
+        created_by: user.id,
+        created_at: now,
+        updated_at: now,
+      });
+
+      teams = await dbRepo.getUserTeams(user.id);
+    }
+
+    // 4. Generate JWT token
     const token = generateToken({ userId: user.id, email: user.email });
 
     const userPayload = {
@@ -116,6 +162,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       success: true,
       message: 'Authentication successful.',
       user: userPayload,
+      teams,
       token,
     });
   } catch (err) {
@@ -125,14 +172,20 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 
 /**
  * @route   GET /api/auth/me
- * @desc    Fetch authenticated user's profile
+ * @desc    Fetch authenticated user's profile and active teams
  * @access  Private (Requires Bearer JWT)
  */
-export function getMe(req: Request, res: Response): void {
-  res.status(200).json({
-    success: true,
-    user: req.user,
-  });
+export async function getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const teams = await dbRepo.getUserTeams(req.user!.id);
+    res.status(200).json({
+      success: true,
+      user: req.user,
+      teams,
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
 /**
