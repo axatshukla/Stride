@@ -2,7 +2,7 @@
 // TaskFlow / Stride — Application Context & Live API Integration
 // ============================================================
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { authApi, taskApi, teamApi, setAuthToken, getAuthToken, setActiveTeamIdHeader, getActiveTeamIdHeader } from '../services/api';
 import { generateId } from '../utils/helpers';
 import type { Task, User, Team, TeamMember, TeamInvitation, TaskFilters, Page, ToastMessage, TaskStatus, TaskPriority } from '../types';
@@ -140,15 +140,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('stride_pending_invite_token');
   }, []);
 
+  // -- Team Cache Ref for Instant 0ms Workspace Switching --
+  const teamCacheRef = useRef<Record<string, { members: TeamMember[]; invitations: TeamInvitation[]; tasks: Task[] }>>({});
+
   // -- Team & Task Fetching Helpers --
   const refreshTasks = useCallback(async () => {
     try {
       const res = await taskApi.getTasks();
       setTasks(res.tasks);
+      if (activeTeam) {
+        if (!teamCacheRef.current[activeTeam.id]) {
+          teamCacheRef.current[activeTeam.id] = { members: teamMembers, invitations: pendingInvitations, tasks: res.tasks };
+        } else {
+          teamCacheRef.current[activeTeam.id].tasks = res.tasks;
+        }
+      }
     } catch (err: any) {
       console.error('Failed to load tasks:', err);
     }
-  }, []);
+  }, [activeTeam, teamMembers, pendingInvitations]);
 
   const refreshTeamData = useCallback(async () => {
     if (!activeTeam) return;
@@ -158,6 +168,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         teamApi.getPendingInvitations(activeTeam.id).catch(() => ({ invitations: [] })),
         taskApi.getTasks().catch(() => ({ tasks: [] })),
       ]);
+      teamCacheRef.current[activeTeam.id] = {
+        members: membersRes.members,
+        invitations: invitesRes.invitations,
+        tasks: tasksRes.tasks,
+      };
       setTeamMembers(membersRes.members);
       setPendingInvitations(invitesRes.invitations);
       setTasks(tasksRes.tasks);
@@ -170,20 +185,57 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setActiveTeam(team);
     setActiveTeamIdHeader(team.id);
     setSelectedTaskIds([]);
+
+    // 1. Instant 0ms Cache or Optimistic Hydration (Old members NEVER flash)
+    const cached = teamCacheRef.current[team.id];
+    if (cached) {
+      setTeamMembers(cached.members);
+      setPendingInvitations(cached.invitations);
+      setTasks(cached.tasks);
+    } else if (user) {
+      const optimisticSelf: TeamMember = {
+        id: `${team.id}_${user.id}`,
+        team_id: team.id,
+        user_id: user.id,
+        name: user.name,
+        email: user.email,
+        initials: user.initials,
+        color: user.color,
+        role: team.role || 'member',
+        joined_at: team.created_at || new Date().toISOString(),
+      };
+      setTeamMembers([optimisticSelf]);
+      setPendingInvitations([]);
+      setTasks([]);
+    } else {
+      setTeamMembers([]);
+      setPendingInvitations([]);
+      setTasks([]);
+    }
+
+    addToast('success', `Switched to workspace "${team.name}"`);
+
+    // 2. Background Revalidation (Sync with server silently)
     try {
       const [membersRes, invitesRes, tasksRes] = await Promise.all([
         teamApi.getTeamMembers(team.id).catch(() => ({ members: [] })),
         teamApi.getPendingInvitations(team.id).catch(() => ({ invitations: [] })),
         taskApi.getTasks().catch(() => ({ tasks: [] })),
       ]);
+
+      teamCacheRef.current[team.id] = {
+        members: membersRes.members,
+        invitations: invitesRes.invitations,
+        tasks: tasksRes.tasks,
+      };
+
       setTeamMembers(membersRes.members);
       setPendingInvitations(invitesRes.invitations);
       setTasks(tasksRes.tasks);
-      addToast('success', `Switched to workspace "${team.name}"`);
     } catch (err: any) {
       console.error('Error switching team:', err);
     }
-  }, [addToast]);
+  }, [user, addToast]);
 
   const acceptInviteToken = useCallback(async (token: string): Promise<{ success: boolean; team?: Team; error?: string }> => {
     try {
