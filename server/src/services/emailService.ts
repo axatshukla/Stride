@@ -3,7 +3,6 @@
 // ============================================================
 
 import nodemailer, { type Transporter } from 'nodemailer';
-import { env } from '../config/env';
 
 export interface SendInviteEmailParams {
   toEmail: string;
@@ -280,8 +279,47 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
   });
 
   const subject = `${params.inviterName} invited you to join ${params.teamName} on Stride`;
-  const fromAddress = process.env.EMAIL_FROM || process.env.SMTP_FROM || `Stride <${process.env.SMTP_USER || params.inviterEmail || 'no-reply@stride.app'}>`;
+  const defaultFrom = process.env.RESEND_API_KEY ? 'Stride <onboarding@resend.dev>' : `Stride <${params.inviterEmail || 'no-reply@stride.app'}>`;
+  const fromAddress = process.env.EMAIL_FROM || process.env.SMTP_FROM || defaultFrom;
+  const textBody = `${params.inviterName} (${params.inviterEmail}) invited you to join ${params.teamName} on Stride.\n\nAccept your invitation here:\n${inviteUrl}\n\nThis link will expire in 7 days.`;
 
+  // Method 1: Resend Direct HTTPS REST API (Fastest & Most Reliable)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: fromAddress,
+          to: [params.toEmail],
+          subject,
+          html,
+          text: textBody,
+        }),
+      });
+
+      const resData = await response.json() as any;
+
+      if (response.ok && resData.id) {
+        console.log(`📧 [Resend] Real invitation email delivered to ${params.toEmail}. Resend ID: ${resData.id}`);
+        return {
+          success: true,
+          messageId: resData.id,
+          simulated: false,
+          inviteUrl,
+        };
+      } else {
+        console.warn(`⚠️ [Resend API Error]:`, resData);
+      }
+    } catch (apiErr: any) {
+      console.error(`⚠️ [Resend Dispatch Error]:`, apiErr.message);
+    }
+  }
+
+  // Method 2: Standard SMTP / Nodemailer
   const transporter = getTransporter();
 
   if (transporter) {
@@ -291,7 +329,7 @@ export async function sendTeamInviteEmail(params: SendInviteEmailParams): Promis
         to: params.toEmail,
         subject,
         html,
-        text: `${params.inviterName} (${params.inviterEmail}) invited you to join ${params.teamName} on Stride.\n\nAccept your invitation here:\n${inviteUrl}\n\nThis link will expire in 7 days.`,
+        text: textBody,
       });
 
       console.log(`📧 Real invitation email sent to ${params.toEmail}. Message ID: ${info.messageId}`);
