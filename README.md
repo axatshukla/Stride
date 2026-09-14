@@ -1,22 +1,23 @@
 <div align="center">
 
-# ⚡ Stride - Make progress, everyday
+# ⚡ Stride — Make progress, everyday
 
-**A high-performance, full-stack productivity workspace engineered with React 19, TypeScript, Express, SQLite, Neon Cloud Postgres, and JWT security.**
+**A high-performance, full-stack productivity & sprint management platform engineered with React 19, TypeScript, Express, SQLite, Neon Cloud Postgres, Real Email Delivery, and Multi-Tenant Team Workspaces.**
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-20%2B-green?style=flat-square&logo=node.js)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-5.2-lightgrey?style=flat-square&logo=express)](https://expressjs.com/)
-[![SQLite](https://img.shields.io/badge/SQLite-WAL%20Mode-003B57?style=flat-square&logo=sqlite)](https://www.sqlite.org/)
-[![Neon Postgres](https://img.shields.io/badge/Database-Neon%20Postgres-00E599?style=flat-square&logo=postgresql)](https://neon.tech/)
-[![Tests](https://img.shields.io/badge/Tests-17%20Passed-brightgreen?style=flat-square&logo=jest)](https://jestjs.io/)
-[![License](https://img.shields.io/badge/License-MIT-purple?style=flat-square)](#-license)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-strideeee.netlify.app-4F46E5?style=for-the-badge&logo=netlify)](https://strideeee.netlify.app)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-5.2-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-WAL%20Mode-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Neon Postgres](https://img.shields.io/badge/Neon-Cloud%20Postgres-00E599?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
+[![Tests](https://img.shields.io/badge/Tests-28%20Passed-brightgreen?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)
+[![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](#-license)
 
 <br />
 
-[Features](#-key-features) • [Tech Stack](#-tech-stack) • [Database Schema](#-database-architecture) • [API Reference](#-api-documentation) • [Getting Started](#-getting-started) • [Testing](#-testing-suite) • [Security](#-security--data-integrity)
+[Live Demo](https://strideeee.netlify.app) • [Key Features](#-key-features) • [Tech Stack](#-tech-stack) • [Database Architecture](#-database-architecture) • [API Reference](#-api-documentation) • [Email Engine](#-real-life-email-dispatch-engine) • [Getting Started](#-getting-started) • [Testing](#-testing-suite) • [Security](#-security--data-integrity)
 
 </div>
 
@@ -24,30 +25,40 @@
 
 ## 📖 Overview
 
-**TaskFlow** is a modern, human-crafted task tracker and sprint management application designed for individuals and fast-moving teams. Inspired by the editorial aesthetics of Linear and Notion, TaskFlow delivers an ultra-smooth user experience with instant responsive interactions, custom HSL design tokens, glassmorphism, comprehensive filter matrices, interactive Kanban drag-and-drop workflows, sprint velocity analytics, calendar schedule tracking, and robust multi-user task delegation.
+**Stride** is a modern sprint management and team collaboration workspace designed for individuals and fast-moving teams. Inspired by the editorial aesthetics of Linear and Notion, Stride delivers an ultra-smooth user experience with instant responsive interactions, custom HSL design tokens, glassmorphism, comprehensive filter matrices, interactive Kanban drag-and-drop workflows, sprint velocity analytics, calendar schedule tracking, multi-tenant team workspaces, and real-life email invitations.
 
-The architecture combines a blazing-fast **React 19 single-page application** powered by Vite with a strict **TypeScript Express REST backend**, featuring a dual-database architecture with high-performance local SQLite (WAL mode) and Cloud Postgres via Neon.
+The platform is deployed live on Netlify with serverless functions and utilizes a **dual-database architecture** supporting local SQLite with Write-Ahead Logging (`WAL`) for lightning-fast local development and **Neon Cloud Postgres** for serverless production scale.
 
 ---
 
 ## ✨ Key Features
 
-### 🗂️ Versatile Task Workspaces
-- **📊 Executive Dashboard**: Real-time KPI metric cards (Total Tasks, In Progress, Completed, Due Soon), velocity progress bars, priority distribution charts, and upcoming deadline tracking.
-- **📋 Structured Task Table**: High-density table view with sortable columns, multi-select checkboxes, and bulk action toolbars (batch deletion, bulk status transitions).
-- **📌 Interactive Kanban Board**: Visual workflow board (`To Do`, `In Progress`, `Done`) with inline card creation, priority tags, due date alerts, and assignee badges.
-- **📅 Calendar View**: Monthly grid rendering task milestones directly onto their due dates with overdue highlights.
-- **📈 Analytics & Velocity**: Sprint completion rate meters, task distribution breakdowns, and team workload insights.
-- **👥 Team Directory**: Workspace team member directory with assigned task counts and role badges.
-- **🏷️ Taxonomy & Tag Management**: Dynamic color-coded tags for custom multi-dimensional filtering.
-- **⚙️ Workspace Preferences**: Dark/light mode theme engine, notification settings, and user profile management.
+### 👥 Multi-Tenant Team Workspaces
+- **🗂️ Card-Wise Workspace Navigation**: Visual, interactive workspace cards. Click any workspace card to enter it immediately with **0ms instant cache hydration**.
+- **🔒 Complete Data Isolation**: Every task, member roster, and invitation is strictly scoped to its active team workspace (`x-team-id` header).
+- **🛡️ Role-Based Access Control (RBAC)**: Supports `owner`, `admin`, and `member` roles with permission gates.
+- **🗑️ Owner Workspace Deletion**: Team owners can permanently delete workspaces with automatic cascade cleanup of tasks, members, and invitations, safeguarded by a confirmation modal.
 
-### 🔐 Enterprise-Grade Authentication & Safety
-- **Stateless JWT Authentication**: Secure Bearer token workflow with configurable token expiration (`1h`).
+### 📧 Real-Life Email Delivery Engine (IRL)
+- **✉️ Branded HTML Templates**: Responsive email templates sent directly to collaborators with 1-click tokenized join links (`/join?token=...`).
+- **🚀 Dual-Engine Delivery**:
+  - **Gmail SMTP**: Direct email dispatch to any recipient worldwide without requiring custom domain verification.
+  - **Resend REST API**: High-throughput REST delivery with automated error reporting and sandbox feedback.
+- **⏱️ Secure Token Lifecycles**: Cryptographically secure 48-character invite tokens with 7-day expiration and automatic acceptance.
+
+### 🗂️ Sprint & Task Management Views
+- **📊 Executive Dashboard**: Real-time KPI metrics (Total Tasks, In Progress, Completed, Due Soon), velocity progress bars, and priority distribution charts.
+- **📋 Structured Task Table**: High-density table view with sortable columns, multi-select checkboxes, and bulk action toolbars (batch deletion, bulk status updates).
+- **📌 Interactive Kanban Board**: Visual workflow board (`To Do`, `In Progress`, `Done`) with priority badges, assignee tags, and due date alerts.
+- **📅 Interactive Calendar**: Monthly calendar grid mapping tasks directly to their deadlines with overdue badges.
+- **📈 Analytics & Velocity**: Sprint completion rate meters, task distribution breakdowns, and team workload insights.
+- **🏷️ Dynamic Tags**: Color-coded taxonomy tags for multi-dimensional filtering and search.
+
+### 🔐 Authentication & Form Security
+- **Stateless JWT Authentication**: Secure Bearer token workflow with configurable expiration (`1h`).
 - **Cryptographic Password Hashing**: Passwords hashed with `bcryptjs` (10 salt rounds).
-- **Protected REST API Routes**: Middleware guarding private routes and ensuring user isolation.
-- **SQL Injection Prevention**: 100% parameterized queries via `better-sqlite3`.
-- **Security Hardening**: Integrated HTTP security headers via `Helmet` and restrictive `CORS` policies.
+- **Password Preview & Strength Indicator**: Interactive show/hide toggle and real-time password strength meter.
+- **Granular Error Handling**: Clear user feedback for invalid credentials, duplicate registrations, and expired sessions.
 
 ---
 
@@ -56,35 +67,38 @@ The architecture combines a blazing-fast **React 19 single-page application** po
 ### Frontend Client
 | Technology | Description |
 |---|---|
-| **React 19** | Latest modern UI library with Hooks and Concurrent rendering |
+| **React 19** | Latest UI library with Concurrent rendering and modern Hooks |
 | **TypeScript** | Strict compile-time type safety across all components and models |
-| **Vite 8** | Next-generation frontend build tool and ultra-fast HMR dev server |
-| **Vanilla CSS Design System** | Bespoke design system utilizing HSL variables, fluid animations, and dark/light themes |
-| **Lucide Icons** | Crisp, scalable icon library |
+| **Vite 8** | Ultra-fast frontend build tool and hot-module replacement (HMR) |
+| **Vanilla CSS Design System** | Custom HSL design tokens, micro-animations, glassmorphism, and responsive layout |
+| **Context API + SWR Cache** | Global state management with 0ms in-memory workspace caching |
 
-### Backend API & Database
+### Backend API & Serverless
 | Technology | Description |
 |---|---|
 | **Node.js + Express 5** | High-performance modular REST API server |
-| **better-sqlite3** | Ultra-fast synchronous SQLite driver configured in Write-Ahead Logging (`WAL`) mode |
-| **Neon Cloud Postgres** | Serverless Postgres integration for cloud data storage |
-| **JSON Web Tokens (`jsonwebtoken`)** | Signed token generation and verification for stateless sessions |
-| **Bcrypt.js** | Industry-standard password hashing algorithm |
-| **Helmet & Morgan** | HTTP security header hardening and request logging |
+| **Serverless HTTP** | Netlify serverless function wrapper (`netlify/functions/api.ts`) |
+| **better-sqlite3** | Synchronous SQLite driver configured in Write-Ahead Logging (`WAL`) mode |
+| **Neon Serverless Postgres** | Cloud database with connection pooling and branching |
+| **Nodemailer** | SMTP transport engine for Gmail and custom mail servers |
+| **Resend API** | Modern cloud email delivery integration |
+| **JSON Web Tokens (`jsonwebtoken`)** | Signed token verification for stateless authentication |
+| **Bcrypt.js** | Password hashing algorithm with salt rounds |
+| **Helmet & Morgan** | HTTP security headers and structured request logging |
 
-### Tooling & QA
+### Tooling & Quality Assurance
 | Technology | Description |
 |---|---|
-| **Jest & ts-jest** | Automated test runner with full TypeScript support |
-| **Supertest** | High-level HTTP assertions for end-to-end API integration tests |
-| **Oxlint** | High-speed JavaScript/TypeScript linter |
-| **TSX** | TypeScript execution engine with watch mode for backend development |
+| **Jest & ts-jest** | Automated test runner with 28 integration test suites |
+| **Supertest** | HTTP assertions for end-to-end REST API verification |
+| **Oxlint** | High-speed JavaScript & TypeScript linter |
+| **TSX** | TypeScript execution engine with live watch mode |
 
 ---
 
 ## 🗄️ Database Architecture
 
-TaskFlow uses a normalized relational schema with foreign key integrity and automated cascade rules.
+Stride features a normalized relational schema with foreign key integrity and automated cascade rules, operational on both **SQLite** and **Neon Cloud Postgres**.
 
 ```
   ┌─────────────────────────────────┐
@@ -100,85 +114,104 @@ TaskFlow uses a normalized relational schema with foreign key integrity and auto
   └───────────────┬─────────────────┘
                   │ 1
                   │
-                  │ *
-  ┌───────────────┴─────────────────┐
-  │              TASKS              │
-  ├─────────────────────────────────┤
-  │ id (PK, TEXT)                   │
-  │ key (TEXT, UNIQUE)              │ ──> e.g. "TASK-101"
-  │ title (TEXT)                    │
-  │ description (TEXT)              │
-  │ status (TEXT: todo/in-prog/done)│
-  │ priority (TEXT: high/med/low)   │
-  │ assignee_id (FK -> users.id)    │ ──> ON DELETE SET NULL
-  │ created_by (FK -> users.id)     │ ──> ON DELETE CASCADE
-  │ due_date (TEXT)                 │
+                  ├───────────────────────────────┐
+                  │ 1                             │ 1
+                  │ *                             │ *
+  ┌───────────────┴─────────────────┐    ┌────────┴────────────────────────┐
+  │              TEAMS              │    │          TEAM_MEMBERS           │
+  ├─────────────────────────────────┤    ├─────────────────────────────────┤
+  │ id (PK, TEXT)                   │    │ id (PK, TEXT)                   │
+  │ name (TEXT)                     │<───┤ team_id (FK -> teams.id)        │
+  │ slug (TEXT)                     │    │ user_id (FK -> users.id)        │
+  │ created_by (FK -> users.id)     │    │ role (owner/admin/member)       │
+  │ created_at / updated_at (TEXT)  │    │ joined_at (TEXT)                │
+  └───────────────┬─────────────────┘    └─────────────────────────────────┘
+                  │ 1
+                  │
+                  ├───────────────────────────────┐
+                  │ *                             │ *
+  ┌───────────────┴─────────────────┐    ┌────────┴────────────────────────┐
+  │              TASKS              │    │         TEAM_INVITATIONS        │
+  ├─────────────────────────────────┤    ├─────────────────────────────────┤
+  │ id (PK, TEXT)                   │    │ id (PK, TEXT)                   │
+  │ key (TEXT, UNIQUE)              │    │ team_id (FK -> teams.id)        │
+  │ team_id (FK -> teams.id)        │    │ email (TEXT)                    │
+  │ title (TEXT)                    │    │ role (member/admin)             │
+  │ description (TEXT)              │    │ token (TEXT, UNIQUE)            │
+  │ status (todo/in-progress/done)  │    │ status (pending/accepted/rev)   │
+  │ priority (high/medium/low)      │    │ created_by (FK -> users.id)     │
+  │ assignee_id (FK -> users.id)    │    │ expires_at (TEXT)               │
+  │ created_by (FK -> users.id)     │    │ created_at (TEXT)               │
+  │ due_date (TEXT)                 │    └─────────────────────────────────┘
   │ tags (TEXT: JSON Array)         │
   │ created_at / updated_at (TEXT)  │
   └─────────────────────────────────┘
-```
-
-### SQL Table Definitions
-```sql
-CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    initials TEXT NOT NULL,
-    color TEXT NOT NULL DEFAULT '#4F46E5',
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS tasks (
-    id TEXT PRIMARY KEY,
-    key TEXT UNIQUE NOT NULL,
-    title TEXT NOT NULL,
-    description TEXT,
-    status TEXT NOT NULL CHECK(status IN ('todo', 'in-progress', 'done')),
-    priority TEXT NOT NULL CHECK(priority IN ('high', 'medium', 'low')),
-    assignee_id TEXT REFERENCES users(id) ON DELETE SET NULL,
-    created_by TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    due_date TEXT,
-    tags TEXT NOT NULL DEFAULT '[]',
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-);
 ```
 
 ---
 
 ## 📡 API Documentation
 
-Base URL: `http://localhost:5000/api`
+Base URL: `http://localhost:5000/api` (Local) or `https://strideeee.netlify.app/api` (Production)
 
-### 🔐 Authentication Endpoints (`/api/auth`)
-
+### 🔐 Authentication (`/api/auth`)
 | Method | Endpoint | Description | Auth Required | Request Body |
 |---|---|---|---|---|
-| `POST` | `/api/auth/signup` | Register new user | No | `{ name, email, password }` |
-| `POST` | `/api/auth/login` | Authenticate & get JWT token | No | `{ email, password }` |
-| `GET` | `/api/auth/me` | Fetch active user profile | `Bearer <token>` | *None* |
+| `POST` | `/api/auth/signup` | Register new user account | No | `{ name, email, password }` |
+| `POST` | `/api/auth/login` | Authenticate & obtain JWT | No | `{ email, password }` |
+| `GET` | `/api/auth/me` | Fetch active profile & teams | `Bearer <token>` | *None* |
 | `GET` | `/api/auth/users` | List users for task assignment | `Bearer <token>` | *None* |
 
-### 📋 Task Management Endpoints (`/api/tasks`)
-
-| Method | Endpoint | Description | Auth Required | Query / Request Body |
+### 👥 Teams & Workspaces (`/api/teams`)
+| Method | Endpoint | Description | Auth Required | Request Body / Query |
 |---|---|---|---|---|
-| `GET` | `/api/tasks` | Get filtered tasks | `Bearer <token>` | Query: `status`, `priority`, `search`, `sortBy` |
-| `GET` | `/api/tasks/stats` | Get sprint velocity & metrics | `Bearer <token>` | *None* |
-| `GET` | `/api/tasks/:id` | Get single task by ID | `Bearer <token>` | *None* |
-| `POST` | `/api/tasks` | Create a new task | `Bearer <token>` | `{ title, description?, status, priority, assignee_id?, due_date?, tags? }` |
-| `PUT` | `/api/tasks/:id` | Update task fields | `Bearer <token>` | Partial `{ title, description, status, priority, assignee_id, due_date, tags }` |
-| `DELETE` | `/api/tasks/:id` | Delete task by ID | `Bearer <token>` | *None* |
-| `POST` | `/api/tasks/bulk-delete` | Batch delete tasks | `Bearer <token>` | `{ ids: string[] }` |
+| `GET` | `/api/teams` | List user's workspaces | `Bearer <token>` | *None* |
+| `POST` | `/api/teams` | Create a new team workspace | `Bearer <token>` | `{ name }` |
+| `DELETE` | `/api/teams/:id` | Delete team workspace (Owner only) | `Bearer <token>` | *None* |
+| `GET` | `/api/teams/:id/members` | Get workspace members | `Bearer <token>` | *None* |
+| `DELETE` | `/api/teams/:id/members/:userId` | Remove member from workspace | `Bearer <token>` | *None* |
+| `POST` | `/api/teams/:id/invite` | Dispatch email invitation | `Bearer <token>` | `{ email, role }` |
+| `GET` | `/api/teams/:id/invitations` | Get pending workspace invites | `Bearer <token>` | *None* |
+| `GET` | `/api/teams/invite/:token` | Inspect invitation details | No | *None* |
+| `POST` | `/api/teams/invite/:token/accept`| Accept invitation & join team | `Bearer <token>` | *None* |
+
+### 📋 Task Management (`/api/tasks`)
+| Method | Endpoint | Description | Auth Required | Header / Body |
+|---|---|---|---|---|
+| `GET` | `/api/tasks` | Get workspace tasks | `Bearer <token>` | `x-team-id: <teamId>` |
+| `GET` | `/api/tasks/stats` | Sprint analytics & metrics | `Bearer <token>` | `x-team-id: <teamId>` |
+| `GET` | `/api/tasks/:id` | Get single task by ID | `Bearer <token>` | `x-team-id: <teamId>` |
+| `POST` | `/api/tasks` | Create task in workspace | `Bearer <token>` | `{ title, description?, status, priority, assignee_id?, due_date?, tags? }` |
+| `PUT` | `/api/tasks/:id` | Update task details | `Bearer <token>` | Partial task update payload |
+| `DELETE` | `/api/tasks/:id` | Delete single task | `Bearer <token>` | *None* |
+| `POST` | `/api/tasks/bulk-delete` | Batch delete selected tasks | `Bearer <token>` | `{ ids: string[] }` |
 
 ### 🩺 Health Check (`/api/health`)
-
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|---|
-| `GET` | `/api/health` | Service health status & uptime | No |
+| `GET` | `/api/health` | Health status and uptime | No |
+
+---
+
+## 📧 Real-Life Email Dispatch Engine
+
+Stride supports two enterprise email delivery strategies:
+
+### Option A: Gmail SMTP (Default & Zero Setup)
+Send real invitation emails to **any recipient address** without requiring a custom domain name:
+```env
+SMTP_SERVICE=gmail
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_16_letter_app_password
+EMAIL_FROM="Stride <your_email@gmail.com>"
+```
+
+### Option B: Resend REST API (Custom Domain)
+Send high-volume transactional emails via Resend:
+```env
+RESEND_API_KEY=re_your_api_key_here
+EMAIL_FROM="Stride <invites@yourdomain.com>"
+```
 
 ---
 
@@ -186,43 +219,43 @@ Base URL: `http://localhost:5000/api`
 
 ```text
 task-tracker/
-├── public/                     # Static assets, SVG icons, favicons
+├── netlify/                    # Netlify serverless functions
+│   └── functions/
+│       └── api.ts              # Express API serverless handler
+├── public/                     # Static assets and favicons
 ├── server/                     # Backend API application
-│   ├── data/                   # SQLite database file storage (taskflow.db)
+│   ├── data/                   # Local SQLite database files (taskflow.db)
 │   ├── src/
-│   │   ├── config/             # Environment configuration (env.ts)
-│   │   ├── controllers/        # REST route handlers (authController, taskController)
-│   │   ├── db/                 # Database initialization, schema, migrations & seed
-│   │   ├── middleware/         # Auth guard, error handlers, not-found handlers
-│   │   ├── routes/             # Express route routers (auth, task, health)
-│   │   ├── utils/              # Token generation, password hashing utils
-│   │   ├── app.ts              # Express application setup
-│   │   └── server.ts           # HTTP server listener
+│   │   ├── config/             # Environment variables (env.ts)
+│   │   ├── controllers/        # REST handlers (auth, tasks, teams)
+│   │   ├── db/                 # Database initialization, schemas & migrations
+│   │   ├── middleware/         # JWT auth guards & error handlers
+│   │   ├── routes/             # Express routers (authRoutes, taskRoutes, teamRoutes)
+│   │   ├── services/           # Production email engine (emailService.ts)
+│   │   ├── utils/              # Token generation & password hashing
+│   │   ├── app.ts              # Express application factory
+│   │   └── server.ts           # Standalone HTTP server
 │   ├── tests/                  # Jest + Supertest REST API test suites
 │   └── tsconfig.json           # Server TypeScript configuration
 ├── src/                        # Frontend React client
-│   ├── assets/                 # Brand graphics and logos
-│   ├── components/             # Reusable UI & feature components
-│   │   ├── auth/               # Login / Signup modal & forms
+│   ├── assets/                 # Brand graphics and icons
+│   ├── components/             # Reusable UI & layout components
+│   │   ├── auth/               # Login / Signup forms & password preview
 │   │   ├── dashboard/          # Metric cards, velocity and priority charts
-│   │   ├── layout/             # Top navbar, responsive sidebar, shell layout
-│   │   ├── tasks/              # Kanban board, Task table, Task modal, Filter bar
-│   │   └── ui/                 # Buttons, Badges, Toasts, Avatars, Empty states
-│   ├── context/                # Global React Context state (AppContext.tsx)
-│   ├── data/                   # Mock and fallback seed datasets
-│   ├── pages/                  # Page views (Dashboard, Board, Calendar, Analytics, etc.)
-│   ├── services/               # REST API client services (api.ts)
-│   ├── types/                  # Shared TypeScript interfaces & models
-│   ├── utils/                  # Helper functions, formatters, date utilities
-│   ├── App.tsx                 # Root application routing & view switcher
-│   ├── index.css               # Global design tokens, themes & CSS reset
+│   │   ├── layout/             # Top navbar, workspace switcher modal, sidebar
+│   │   ├── tasks/              # Kanban board, task table, modal, filter bar
+│   │   └── ui/                 # Buttons, Badges, Toasts, Avatars
+│   ├── context/                # Global React Context with SWR cache (AppContext.tsx)
+│   ├── pages/                  # Page views (Dashboard, Board, Calendar, Team, etc.)
+│   ├── services/               # Frontend API client (api.ts)
+│   ├── types/                  # TypeScript interfaces & models
+│   ├── utils/                  # Helper utilities and formatters
+│   ├── App.tsx                 # Root application router
+│   ├── index.css               # Design system tokens and global reset
 │   └── main.tsx                # Client entry point
-├── .env.example                # Sample environment variables template
-├── jest.config.cjs             # Jest testing configuration
+├── netlify.toml                # Netlify deployment & redirect config
 ├── package.json                # Project dependencies & npm scripts
-├── tsconfig.json               # Root project TypeScript references
-├── tsconfig.app.json           # Client Vite TypeScript configuration
-├── tsconfig.node.json          # Node tools TypeScript configuration
+├── tsconfig.json               # Root TypeScript configuration
 └── vite.config.ts              # Vite configuration
 ```
 
@@ -236,8 +269,8 @@ task-tracker/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/task-tracker.git
-cd task-tracker
+git clone https://github.com/axatshukla/Stride.git
+cd Stride
 ```
 
 ### 2. Install Dependencies
@@ -246,55 +279,43 @@ npm install
 ```
 
 ### 3. Configure Environment Variables
-Copy `.env.example` to create your local `.env` file:
+Create your local `.env` file from `.env.example`:
 ```bash
 cp .env.example .env
 ```
 
-Default configuration in `.env`:
+Configure your `.env`:
 ```env
 PORT=5000
 NODE_ENV=development
 CLIENT_ORIGIN=http://localhost:5173
-JWT_SECRET=your_jwt_secret_key_here
+JWT_SECRET=stride_super_secret_jwt_key_2026
 JWT_EXPIRES_IN=1h
+
+# Database Configuration
 DB_TYPE=sqlite
 DB_PATH=./server/data/taskflow.db
+
+# Real Email Delivery (Gmail SMTP)
+SMTP_SERVICE=gmail
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_16_character_app_password
+EMAIL_FROM="Stride <your_email@gmail.com>"
 ```
 
 ### 4. Run Development Servers
-
-Open two terminal tabs to run both client and server concurrently:
-
-#### Terminal 1 — Backend API:
-```bash
-npm run server:dev
-```
-*The Express REST API will start on `http://localhost:5000`.*
-
-#### Terminal 2 — Frontend Client:
+Run both client and server concurrently:
 ```bash
 npm run dev
 ```
-*The Vite development server will start on `http://localhost:5173`.*
-
----
-
-## 👤 Default Demo Credentials
-
-The database automatically initializes and seeds demo workspace accounts on first startup:
-
-| Account | Email | Password | Role |
-|---|---|---|---|
-| **Akshat Shukla** | `akshat@taskflow.dev` | `password123` | Admin / Lead |
-| **Sarah Chen** | `sarah@taskflow.dev` | `password123` | Senior Engineer |
-| **Marcus Johnson** | `marcus@taskflow.dev` | `password123` | Product Designer |
+- Client runs on `http://localhost:5173`
+- Backend API runs on `http://localhost:5000`
 
 ---
 
 ## 🧪 Testing Suite
 
-TaskFlow includes an automated integration test suite utilizing **Jest** and **Supertest** to validate all authentication flows and task CRUD lifecycles.
+Stride includes a comprehensive integration test suite covering 28 automated test assertions across authentication, task management, and multi-tenant team workflows.
 
 ```bash
 # Run all automated test suites
@@ -302,47 +323,35 @@ npm test
 ```
 
 ### Test Coverage Highlights:
-- ✅ **Authentication**: User signup, duplicate email rejection, password strength validation, valid login JWT generation, invalid credential rejection, authenticated `/api/auth/me` profile retrieval.
-- ✅ **Task Management**: Auth token guard enforcement, task creation and auto-key generation, input validation, detail retrieval, lifecycle updates (status/priority), deletion persistence, and sprint statistics aggregation.
+- ✅ **Authentication**: User registration, password validation, duplicate rejection, login JWT issuance, invalid password rejection, profile retrieval.
+- ✅ **Task Management**: Auth token guard, task creation with auto-increment keys, lifecycle transitions, filtering matrices, sprint statistics calculation.
+- ✅ **Team Workspaces & Invites**: Team creation, member listings, email invitation dispatch with secure tokens, public invite lookup, invitation acceptance, data isolation between teams, and owner-only workspace deletion.
 
 ---
 
 ## 🛡️ Security & Data Integrity
 
-- **Password Security**: Uses `bcryptjs` with 10 salt rounds to hash credentials before storage.
-- **Stateless Verification**: JWT validation occurs on every protected API endpoint via centralized `authMiddleware`.
-- **Injection Safety**: Parameterized queries guarantee protection against SQL injection vulnerabilities.
-- **CORS & Headers**: Strict CORS origin whitelisting (`CLIENT_ORIGIN`) and Helmet security headers prevent cross-site scripting and unauthorized embedding.
-- **Relational Integrity**: SQLite foreign key support (`PRAGMA foreign_keys = ON`) guarantees referential integrity between users and tasks.
+- **Bcrypt Password Hashing**: Passwords are cryptographically salted and hashed before persistence.
+- **JWT Authorization Guards**: Protected routes enforce valid Bearer tokens and verify session validity.
+- **Multi-Tenant Scoping**: All task queries enforce team boundary isolation via `x-team-id` headers.
+- **SQL Injection Prevention**: 100% parameterized queries via `better-sqlite3` and Neon tagged template literals.
+- **HTTP Security Hardening**: Secured with `Helmet` security headers and restrictive CORS policies.
 
 ---
 
-## 📦 Production Build
+## 📦 Production Deployment
 
-To compile both client and backend for production deployment:
-
+### Netlify Deployment
+Stride is configured for 1-click Netlify deployment with automatic serverless functions:
 ```bash
 # Build the client bundle with Vite
 npm run build
-
-# Compile the server TypeScript code
-npm run server:build
-
-# Start the compiled production server
-npm run server:start
 ```
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+In your Netlify Site Configuration:
+1. Set Build Command: `npm ci && npm run build`
+2. Set Publish Directory: `dist`
+3. Set Functions Directory: `netlify/functions`
+4. Add environment variables: `SMTP_USER`, `SMTP_PASS`, `JWT_SECRET`, `DATABASE_URL` (for Neon Postgres).
 
 ---
 
@@ -353,5 +362,5 @@ This project is open source and available under the [MIT License](LICENSE).
 ---
 
 <div align="center">
-  Crafted with ❤️ by <a href="https://github.com/akshat-shukla">Akshat Shukla</a>
+  Crafted with ❤️ by <a href="https://github.com/axatshukla">Akshat Shukla</a>
 </div>
